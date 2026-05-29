@@ -4,11 +4,8 @@ var DSP_CLOUDFLARE = NewDnsProvider('cloudflare');
 
 // 1. Core Default Records
 var totalRecords = [
-    A('@', '185.199.108.153'),
-    A('@', '185.199.109.153'),
-    A('@', '185.199.110.153'),
-    A('@', '185.199.111.153'),
-    CNAME('www', 's8rr.github.io.')
+
+    CNAME('www', 'code-space.me')
 ];
 
 // 2. Safely load the generated flat database index
