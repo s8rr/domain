@@ -49,15 +49,24 @@ jobs:
           "
 
       - name: Create Production Credentials
+        env:
+          CF_SECRET: ${{ secrets.DOMAIN }}
+          CF_VAR: ${{ vars.DOMAIN }}
         run: |
+          # Fallback check: attempts to pull from Secrets first, then checks Variables
+          CLOUDFLARE_API_TOKEN="${CF_SECRET:-$CF_VAR}"
+          
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Could not find your API key! Ensure 'DOMAIN' is set under either Actions Secrets or Actions Variables."
+            exit 1
+          fi
+          
           echo '{
             "cloudflare": {
               "TYPE": "CLOUDFLAREAPI",
               "apitoken": "'"$CLOUDFLARE_API_TOKEN"'"
             }
           }' > creds.json
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.DOMAIN }}
 
       - name: Install DNSControl
         uses: gacts/install-dnscontrol@v1
