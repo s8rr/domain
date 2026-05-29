@@ -6,7 +6,8 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write # Required to add/remove labels
+  pull-requests: write # Required for labels and closing
+  issues: write        # Required for posting comments
 
 jobs:
   validate:
@@ -35,38 +36,40 @@ jobs:
         run: node util/get-pr-files.js
 
       - name: Run Validation Tests
-        id: validation # Added ID to reference this step's outcome
+        id: validation
         run: npm run validate
         env:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_AUTHOR_ID: ${{ github.event.pull_request.user.id }}
           PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
 
-      - name: Handle Ownership Labels
-        if: always() # Ensures this runs even if validation fails
+      - name: Handle Ownership Status
+        if: always()
         uses: actions/github-script@v7
         with:
           script: |
             const isSuccess = "${{ steps.validation.outcome }}" === "success";
-            const labelToAdd = isSuccess ? "ownership: verified" : "ownership: unauthorized";
-            const labelToRemove = isSuccess ? "ownership: unauthorized" : "ownership: verified";
+            const prNumber = context.issue.number;
 
-            // Remove the opposite label
-            try {
-              await github.rest.issues.removeLabel({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: labelToRemove
+            if (isSuccess) {
+              // Handle Verified
+              await github.rest.issues.removeLabel({ ...context.repo, issue_number: prNumber, name: 'ownership: unauthorized' }).catch(() => {});
+              await github.rest.issues.addLabels({ ...context.repo, issue_number: prNumber, labels: ['ownership: verified'] });
+            } else {
+              // Handle Unauthorized
+              await github.rest.issues.removeLabel({ ...context.repo, issue_number: prNumber, name: 'ownership: verified' }).catch(() => {});
+              await github.rest.issues.addLabels({ ...context.repo, issue_number: prNumber, labels: ['ownership: unauthorized'] });
+              
+              // Tag s8rr and close the PR
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: prNumber,
+                body: '@s8rr This PR has failed validation and has been marked as ownership: unauthorized. Please review.'
               });
-            } catch (e) {
-              // Label didn't exist, ignore
+              
+              await github.rest.pulls.update({
+                ...context.repo,
+                pull_number: prNumber,
+                state: 'closed'
+              });
             }
-
-            // Add the appropriate label
-            await github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: [labelToAdd]
-            });
