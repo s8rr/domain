@@ -10,9 +10,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # fetch-depth: 0 ensures the entire git history is available,
-          # allowing the validator to compare the PR against the main branch.
-          fetch-depth: 0 
+          fetch-depth: 0
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
@@ -33,37 +31,23 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const domainsDir = path.join(process.cwd(), 'domains');
-          
-          if (!fs.existsSync(domainsDir)) {
-            console.error('❌ Error: domains folder not found in current workspace root.');
-            process.exit(1);
-          }
-          
+          if (!fs.existsSync(domainsDir)) process.exit(1);
           const files = fs.readdirSync(domainsDir);
-          const result = [];
-          
-          files.forEach(f => {
-            if(f.endsWith('.json') && f !== 'example.json') {
-              const data = JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8'));
-              result.push({ subdomain: f.replace('.json', '').toLowerCase(), records: data.records });
-            }
-          });
-          
-          const outputPath = path.join(process.cwd(), 'dist-domains.json');
-          fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
-          console.log('✅ Compiled ' + result.length + ' domains into ' + outputPath);
+          const result = files
+            .filter(f => f.endsWith('.json') && f !== 'example.json')
+            .map(f => ({ subdomain: f.replace('.json', '').toLowerCase(), records: JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8')).records }));
+          fs.writeFileSync('dist-domains.json', JSON.stringify(result, null, 2));
           "
 
-      - name: Create creds.json for DNSControl Preview
-        run: |
-          echo '{
-            "cloudflare": {
-              "TYPE": "CLOUDFLAREAPI",
-              "apitoken": "'"$CLOUDFLARE_API_TOKEN"'"
-            }
-          }' > creds.json
+      - name: Validate Secret and Create creds.json
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.DOMAIN }}
+          CF_TOKEN: ${{ secrets.DOMAIN }}
+        run: |
+          if [ -z "$CF_TOKEN" ]; then
+            echo "::error::Secret 'DOMAIN' is empty or not accessible!"
+            exit 1
+          fi
+          echo '{"cloudflare": {"TYPE": "CLOUDFLAREAPI", "apitoken": "'"$CF_TOKEN"'"}}' > creds.json
 
       - name: Install DNSControl
         uses: gacts/install-dnscontrol@v1
