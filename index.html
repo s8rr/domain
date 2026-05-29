@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>code-space.me | Free Subdomains for Bangladeshi Developers</title>
+    <link rel="stylesheet" href="styles.css">
+    </head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-left">
+                <div class="logo">code-space</div>
+            </div>
+            <div class="navbar-center">
+                <nav class="nav-links">
+                    <a href="#checker">Search</a>
+                    <a href="#docs">Docs</a>
+                    <a href="https://github.com/s8rr/domain" target="_blank">GitRepo</a>
+                    <a href="#faq">FAQ</a>
+                </nav>
+            </div>
+            <div class="navbar-right">
+                <button class="theme-toggle" aria-label="Toggle theme">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                        <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 010 1.06l-1.591 1.591a.75.75 0 11-1.06-1.06l1.591-1.591a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM18.894 17.834a.75.75 0 01-1.06 0l-1.591-1.591a.75.75 0 111.06-1.06l1.591 1.591a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM5.106 17.834a.75.75 0 010-1.06l1.591-1.591a.75.75 0 111.06 1.06l-1.591 1.591a.75.75 0 01-1.06 0zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm2.106-5.834a.75.75 0 011.06 0l1.591 1.591a.75.75 0 11-1.06 1.06L5.106 6.166a.75.75 0 010-1.06z"></path>
+                    </svg>
+                </button>
+                <a href="#checker" class="btn-dashboard">Claim yours</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <section class="hero-section">
+            <div class="hero-globe">🌐</div>
+            <h1 class="hero-title">code-space.me</h1>
+            <p class="hero-subtitle">A free identity for Bangladeshi developers and students on the web. Claim your unique subdomain today.</p>
+            <div class="hero-buttons">
+                <a href="#checker" class="btn-primary">Claim a subdomain</a>
+                <a href="https://github.com/s8rr/domain" target="_blank" class="btn-secondary">Source code</a>
+            </div>
+        </section>
+
+        <section id="checker" class="availability-section card">
+            <h2>Find Your Perfect Subdomain</h2>
+            <p class="section-desc">Search for your desired username and see instantly if it's available for your personal site or project.</p>
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="subdomain-input" placeholder="yourname">
+                    <span class="extension">.code-space.me</span>
+                    <button onclick="checkDomain()">Check Availability</button>
+                </div>
+                <div id="result-message" class="result"></div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h2>What is code-space.me?</h2>
+            <div class="info-text">
+                <p>Are you a developer looking for an awesome name for your personal website or projects? code-space.me gives you a free <code>yourname.code-space.me</code> subdomain that points to your static site via a CNAME DNS record.</p>
+                <p>The entire registry lives in a public GitHub repository. You claim your subdomain by submitting a pull request. Works with GitHub Pages, Vercel, Netlify, and other static hosts.</p>
+            </div>
+            <div class="tags-row">
+                <span class="tag">me.code-space.me</span>
+                <span class="tag">bd.code-space.me</span>
+                <span class="tag">yourname.code-space.me</span>
+            </div>
+        </section>
+
+        <section id="docs" class="how-to-section">
+            <h2>How to claim your subdomain</h2>
+            <p class="section-desc">Four steps, all done through GitHub.</p>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <h3>Star and fork</h3>
+                    <p>Star the repository, then fork it to your own GitHub account.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <h3>Set up your site</h3>
+                    <p>Deploy your site to GitHub Pages, Netlify, Vercel, or any static host. Note the CNAME value (e.g. yourusername.github.io).</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <h3>Add your subdomain</h3>
+                    <p>Create a <code>yourname.json</code> file in the <code>domains/</code> folder. Edit the JSON to include your username and target CNAME.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <h3>Submit a pull request</h3>
+                    <p>Open a PR against the main repo. Once merged, your subdomain will go live within minutes.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="entry-section">
+            <h2>The subdomain entry</h2>
+            <p class="section-desc">Add a JSON object like this to <code>yourname.json</code>.</p>
+            
+            <div class="code-window">
+                <div class="code-header">
+                    <span class="filename">yourname.json</span>
+                    <span class="language">JSON</span>
+                </div>
+                <div class="code-body">
+                    <pre>
+{
+  "owner": {
+    "username": "s8rr",
+    "email": "hello@example.com"
+  },
+  "records": {
+    "CNAME": "s8rr.github.io"
+  }
+}</pre>
+                </div>
+            </div>
+            <p class="section-paragraph">Replace <code>yourname</code> with your desired subdomain and update the owner details. Point the CNAME value to your hosted site URL.</p>
+        </section>
+
+        <section class="cta-section card">
+            <div class="cta-globe">🌐</div>
+            <h2>Ready to claim yours?</h2>
+            <p>Fork the repo, add your entry, and open a pull request. Your subdomain goes live once it's merged.</p>
+            <a href="https://github.com/s8rr/domain" target="_blank" class="btn-primary-large">Fork on GitHub →</a>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col-brand">
+                <div class="logo">code-space.me</div>
+                <p>A developer platform built to simplify your identity workflow.</p>
+                <div class="footer-icons">
+                    <a href="https://x.com/your-username" target="_blank" aria-label="X (Twitter)">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                    <a href="https://github.com/s8rr/domain" target="_blank" aria-label="GitHub">
+                        <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-col-nav">
+                <h4>Products</h4>
+                <ul>
+                    <li><a href="https://is-a.dev" target="_blank">is-a.dev</a></li>
+                    <li><a href="https://code-space.me" target="_blank">code-space.me</a></li>
+                    <li><a href="#checker">Subdomain Registry</a></li>
+                    <li><a href="#docs">API Integration</a></li>
+                </ul>
+            </div>
+            <div class="footer-col-nav">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="https://github.com/s8rr/domain" target="_blank">DNSControl Conf</a></li>
+                    <li><a href="#checker">Domain Lookup</a></li>
+                    <li><a href="https://github.com/gacts/install-dnscontrol" target="_blank">Install DNSControl</a></li>
+                    <li><a href="https://www.whois.com" target="_blank">WHOIS lookup</a></li>
+                </ul>
+            </div>
+            <div class="footer-col-nav">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a href="https://github.com/s8rr/domain" target="_blank">GitHub</a></li>
+                    <li><a href="https://x.com/your-username" target="_blank">X (Twitter)</a></li>
+                    <li><a href="mailto:support@code-space.me">Support Email</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>© 2026 code-space.me. Bangladesh Developer Platform.</p>
+            <div class="footer-bottom-actions">
+                <a href="#checker">Find Yours →</a>
+                <button class="theme-toggle-darkmode" aria-label="Dark mode toggle">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 010 1.06l-1.591 1.591a.75.75 0 11-1.06-1.06l1.591-1.591a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM18.894 17.834a.75.75 0 01-1.06 0l-1.591-1.591a.75.75 0 111.06-1.06l1.591 1.591a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM5.106 17.834a.75.75 0 010-1.06l1.591-1.591a.75.75 0 111.06 1.06l-1.591 1.591a.75.75 0 01-1.06 0zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm2.106-5.834a.75.75 0 011.06 0l1.591 1.591a.75.75 0 11-1.06 1.06L5.106 6.166a.75.75 0 010-1.06z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function checkDomain() {
+            const input = document.getElementById('subdomain-input').value.trim().toLowerCase();
+            const resultDiv = document.getElementById('result-message');
+            
+            // Basic validation
+            if (!input || !/^[a-z0-9-]+$/.test(input)) {
+                resultDiv.className = "result error";
+                resultDiv.innerHTML = "Please enter a valid alphanumeric subdomain (lowercase, numbers, dashes only).";
+                return;
+            }
+
+            resultDiv.className = "result loading";
+            resultDiv.innerHTML = "Searching GitHub registry records...";
+
+            try {
+                // Fetch the file directly from your GitHub repository using the public contents API
+                const repoOwner = "s8rr"; 
+                const repoName = "domain";
+                const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/domains/${input}.json`;
+                
+                const response = await fetch(url);
+
+                if (response.status === 404) {
+                    // Domain is available
+                    resultDiv.className = "result success";
+                    resultDiv.innerHTML = `🎉 <strong>${input}.code-space.me</strong> is available! Follow the docs to claim it.`;
+                } else if (response.ok) {
+                    // Domain is taken, parse the file content
+                    const fileData = await response.json();
+                    const config = JSON.parse(atob(fileData.content));
+                    
+                    resultDiv.className = "result taken";
+                    resultDiv.innerHTML = `❌ <strong>${input}.code-space.me</strong> is already taken.<br>
+                                           👤 <strong>Owner:</strong> <a href="https://github.com/${config.owner.username}" target="_blank" style="color: #60a5fa; text-decoration: underline;">@${config.owner.username}</a>`;
+                } else {
+                    throw new Error();
+                }
+            } catch (err) {
+                resultDiv.className = "result error";
+                resultDiv.innerHTML = "Error reaching GitHub system. Please try again later.";
+            }
+        }
+    </script>
+</body>
+</html>
