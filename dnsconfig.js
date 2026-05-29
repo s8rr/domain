@@ -21,7 +21,13 @@ try {
         var records = item.records;
 
         if (records && records.CNAME) {
-            totalRecords.push(CNAME(subdomain, records.CNAME, CF_PROXY_OFF));
+            // Sanitize the CNAME target to ensure it ends with a trailing dot
+            var target = records.CNAME.trim();
+            if (!target.endsWith('.')) {
+                target = target + '.';
+            }
+            
+            totalRecords.push(CNAME(subdomain, target, CF_PROXY_OFF));
         }
         
         if (records && records.A) {
