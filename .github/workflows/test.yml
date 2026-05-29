@@ -11,6 +11,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
+          # pull_request_target runs in the context of the main branch,
+          # so we explicitly fetch the PR branch depth to run accurate diffs
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
@@ -23,23 +25,12 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Get Changed and Deleted Files
-        id: files
-        # This step uses GitHub CLI to get files changed in this PR 
-        # and formats them into JSON arrays for your AVA script.
+      - name: Fetch Target Branch for Diffing
         run: |
-          PR_NUM=${{ github.event.pull_request.number }}
-          
-          # Fetch changed files
-          CHANGED=$(gh pr view $PR_NUM --json files --jq '[.files[].path]')
-          echo "CHANGED_FILES=$CHANGED" >> $GITHUB_ENV
-          
-          # Note: For complex deleted files payloads (with historical text data),
-          # services like is-a.dev use a specialized companion action step.
-          # For a basic setup, passing a JSON string representation works.
-          echo "DELETED_FILES=[]" >> $GITHUB_ENV 
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git fetch origin main:origin/main
+
+      - name: Extract PR File Diffs
+        run: node util/get-pr-files.js
 
       - name: Run Validation Tests
         run: npx ava
