@@ -29,9 +29,9 @@ function validate() {
 
         const filename = path.parse(file).name.toLowerCase();
         
-        // 1. Check for alphanumeric, lowercase, dash, and underscore domain limits (Route B)
-        if (!/^[a-z0-9_-]+$/.test(filename)) {
-            console.error(`❌ Error: Filename "${filename}" must contain only lowercase letters, numbers, dashes, and underscores.`);
+        // 1. Check for alphanumeric, lowercase, dash, underscore, and dot domain limits
+        if (!/^[a-z0-9_.-]+$/.test(filename)) {
+            console.error(`❌ Error: Filename "${filename}" must contain only lowercase letters, numbers, dashes, underscores, and dots.`);
             process.exit(1);
         }
 
