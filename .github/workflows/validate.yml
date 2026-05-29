@@ -12,11 +12,10 @@ jobs:
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
-        with:
-          node-cache: 'npm'
+        # Removed invalid 'node-cache' input to clear the runner warning
 
       - name: Install Linting Packages
-        run: npm ci
+        run: npm install # Changed from 'npm ci' to fix the lockfile sync error
 
       - name: Run Core Code Validator
         run: npm run validate
