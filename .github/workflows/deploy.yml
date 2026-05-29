@@ -18,7 +18,7 @@ jobs:
           const domainsDir = path.join(process.cwd(), 'domains');
           
           if (!fs.existsSync(domainsDir)) {
-            console.error('❌ Error: domains folder not found in current workspace root.');
+            console.error('❌ Error: domains folder missing.');
             process.exit(1);
           }
           
@@ -27,14 +27,25 @@ jobs:
           
           files.forEach(f => {
             if(f.endsWith('.json') && f !== 'example.json') {
-              const data = JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8'));
-              result.push({ subdomain: f.replace('.json', '').toLowerCase(), records: data.records });
+              try {
+                const data = JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8'));
+                if (data.records) {
+                  // Extracts full nested subdomain handling dots (e.g. '_vercel.example.json' -> '_vercel.example')
+                  const calculatedSubdomain = f.substring(0, f.lastIndexOf('.json')).toLowerCase().trim();
+                  
+                  result.push({ 
+                    subdomain: calculatedSubdomain, 
+                    records: data.records 
+                  });
+                }
+              } catch(err) {
+                console.error('Malformed file skipped: ' + f);
+              }
             }
           });
           
-          const outputPath = path.join(process.cwd(), 'dist-domains.json');
-          fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
-          console.log('✅ Compiled ' + result.length + ' domains into ' + outputPath);
+          fs.writeFileSync('./dist-domains.json', JSON.stringify(result, null, 2));
+          console.log('✅ Compiled ' + result.length + ' structural record files.');
           "
 
       - name: Create Production Credentials

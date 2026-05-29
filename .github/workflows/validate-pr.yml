@@ -1,0 +1,89 @@
+name: Validate Pull Request Domain Ownership
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'domains/**'
+
+# ⚠️ CRITICAL: Gives the action clearance to write labels to your PR dashboard list
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  validate-ownership:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Process, Validate, and Label Pull Request
+        env:
+          PR_ACTOR: ${{ github.actor }}
+          ADMIN_USER: "s8rr"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Authenticates the built-in gh CLI
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          node -e "
+          const { execSync } = require('child_process');
+          const path = require('path');
+          
+          const actor = process.env.PR_ACTOR;
+          const admin = process.env.ADMIN_USER;
+          const prNum = process.env.PR_NUMBER;
+          
+          // Function to safely apply a label to the PR via GitHub CLI
+          const addLabel = (label) => {
+            try { execSync('gh pr edit ' + prNum + ' --add-label \"' + label + '\"'); } catch(e) {}
+          };
+          const removeLabel = (label) => {
+            try { execSync('gh pr edit ' + prNum + ' --remove-label \"' + label + '\"'); } catch(e) {}
+          };
+
+          try {
+            // 1. Detect modification types to add contextual type labels
+            const addedFiles = execSync('git diff --name-only --diff-filter=A origin/main...HEAD').toString().trim();
+            const modifiedFiles = execSync('git diff --name-only --diff-filter=M origin/main...HEAD').toString().trim();
+            
+            if (addedFiles.includes('domains/')) addLabel('type: new-domain');
+            if (modifiedFiles.includes('domains/')) addLabel('type: domain-update');
+
+            if (actor === admin) {
+              console.log('👑 Admin bypass verified.');
+              addLabel('status: valid');
+              process.exit(0);
+            }
+
+            // 2. Run the code-ownership validation loops
+            const changedFiles = execSync('git diff --name-only origin/main...HEAD')
+              .toString()
+              .trim()
+              .split('\n')
+              .filter(f => f.startsWith('domains/') && f.endsWith('.json') && !f.endsWith('example.json'));
+
+            changedFiles.forEach(filePath => {
+              const fileName = path.basename(filePath);
+              const cleanName = fileName.replace('.json', '');
+              const parts = cleanName.split('.');
+              const fileOwner = parts[parts.length - 1].toLowerCase().trim();
+
+              if (fileOwner !== actor.toLowerCase()) {
+                throw new Error('User ' + actor + ' is unauthorized to edit records belonging to ' + fileOwner);
+              }
+            });
+
+            console.log('✅ Validation successful.');
+            removeLabel('status: invalid');
+            addLabel('status: valid');
+            
+          } catch (error) {
+            console.error('❌ VALIDATION FAILURE:', error.message);
+            removeLabel('status: valid');
+            addLabel('status: invalid');
+            process.exit(1);
+          }
+          "

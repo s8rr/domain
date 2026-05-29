@@ -4,6 +4,6 @@
     "email": "hello@example.com"
   },
   "records": {
-    "CNAME": "theiglmail-droid"
+    "CNAME": "theiglmail-droid.github.io"
   }
 }

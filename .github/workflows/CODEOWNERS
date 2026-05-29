@@ -1,0 +1,2 @@
+# Whenever anyone modifies or adds a file in domains/, automatically tag you for review
+/domains/ @s8rr
