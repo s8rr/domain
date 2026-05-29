@@ -3,7 +3,7 @@ name: Core Domain Validator
 on:
   pull_request_target:
     branches: [ main ]
-    types: [opened, synchronize, reopened, labeled] # Added 'labeled' trigger
+    types: [opened, synchronize, reopened, labeled]
 
 permissions:
   contents: read
@@ -40,13 +40,16 @@ jobs:
             const labels = context.payload.pull_request.labels.map(l => l.name);
             if (labels.includes('bypass')) {
               console.log('Bypass detected. Exiting.');
-              process.exit(0); // Exit successfully, skipping validation
+              process.exit(0); 
             }
             if (labels.includes('draft')) {
-              console.log('Draft detected. Closing.');
-              await github.rest.pulls.update({ ...context.repo, pull_number: context.issue.number, state: 'closed' });
-              await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body: '🚧 PR marked as draft. Closing until ready.' });
-              process.exit(1); // Exit with error to stop further steps
+              console.log('Draft detected. Posting comment.');
+              await github.rest.issues.createComment({ 
+                ...context.repo, 
+                issue_number: context.issue.number, 
+                body: '🚧 PR marked as draft. Validation skipped.' 
+              });
+              process.exit(1); 
             }
 
       - name: Extract PR File Diffs
@@ -79,11 +82,5 @@ jobs:
                 ...context.repo,
                 issue_number: prNumber,
                 body: '@s8rr This PR has failed validation and has been marked as ownership: unauthorized. Please review.'
-              });
-              
-              await github.rest.pulls.update({
-                ...context.repo,
-                pull_number: prNumber,
-                state: 'closed'
               });
             }
