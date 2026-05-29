@@ -1,31 +1,44 @@
 name: Validate Domain Registry
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Head Code
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install Linting Packages
+      - name: Install Dependencies
         run: npm install
 
-      - name: Run Core Code Validator
-        run: npm run validate
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
+      - name: Fetch Target Branch for Diffing
+        run: git fetch origin main:origin/main
 
-      - name: Compile JSON Registry Index
+      - name: Extract PR File Diffs
+        run: node util/get-pr-files.js
+
+      - name: Run Core Code Validator (AVA)
+        run: npx ava
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_ID: ${{ github.event.pull_request.user.id }}
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+
+      - name: Compile JSON Registry Index (Dry-Run Test)
         run: |
           node -e "
           const fs = require('fs');
