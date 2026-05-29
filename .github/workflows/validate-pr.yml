@@ -20,23 +20,45 @@ jobs:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
           fetch-depth: 0 
 
-      - name: Process and Label Pull Request
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Process, Verify Ownership, and Label
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          node -e "
+          # Write the pure script to a file to prevent messy bash quote escaping
+          cat << 'EOF' > verify-ownership.js
           const { execSync } = require('child_process');
-          
+          const fs = require('fs');
+
           const prNum = process.env.PR_NUMBER;
+          const prAuthor = process.env.PR_AUTHOR;
+          const maintainer = 's8rr'; // 👈 Your GitHub username for tagging
+
           const addLabel = (label) => {
-            try { execSync('gh pr edit ' + prNum + ' --add-label \"' + label + '\"'); } catch(e) {}
+            try { execSync(`gh pr edit ${prNum} --add-label "${label}"`); } catch(e) {}
+          };
+
+          const closePR = () => {
+            try { execSync(`gh pr close ${prNum}`); } catch(e) {}
+          };
+
+          const addComment = (message) => {
+            try { execSync(`gh pr comment ${prNum} --body "${message}"`); } catch(e) {}
           };
 
           try {
+            // Ensure we have access to the main branch history to read baseline files
+            execSync('git fetch origin main');
+
             const getFiles = (filter) => {
               try {
-                return execSync('git diff --name-only --diff-filter=' + filter + ' HEAD^1 HEAD')
+                return execSync(`git diff --name-only --diff-filter=${filter} origin/main HEAD`)
                   .toString().trim().split('\n').filter(Boolean);
               } catch(e) { return []; }
             };
@@ -44,16 +66,65 @@ jobs:
             const addedFiles = getFiles('A');
             const modifiedFiles = getFiles('M');
             const deletedFiles = getFiles('D');
-            
+
             const isDomainFile = f => f.includes('domains/') && f.endsWith('.json') && !f.endsWith('example.json');
-            
+
             const newDomains = addedFiles.filter(isDomainFile);
             const existingDomainsChanged = [...modifiedFiles, ...deletedFiles].filter(isDomainFile);
-            
+
+            // Add standard structural tracking labels
             if (newDomains.length > 0) addLabel('type: new-domain');
             if (existingDomainsChanged.length > 0) addLabel('type: domain-update');
-            
+
+            // --- OWNERSHIP VERIFICATION LOGIC ---
+            let ownershipViolation = false;
+            let violatedFile = '';
+            let trueOwner = '';
+
+            for (const file of existingDomainsChanged) {
+              try {
+                // CRUCIAL SECURITY: Read historical file from origin/main branch to discover the REAL owner
+                const originalContent = execSync(`git show origin/main:${file}`).toString();
+                const originalJson = JSON.parse(originalContent);
+                
+                // Adjust 'owner' key below if your JSON structure uses a different path/casing
+                if (originalJson.owner && originalJson.owner.toLowerCase() !== prAuthor.toLowerCase()) {
+                  ownershipViolation = true;
+                  violatedFile = file;
+                  trueOwner = originalJson.owner;
+                  break; 
+                }
+              } catch (err) {
+                // File did not exist on main branch historically, skip security verification
+              }
+            }
+
+            if (ownershipViolation) {
+              console.log(`❌ Security Alert: @${prAuthor} attempted to modify ${violatedFile} owned by @${trueOwner}`);
+              
+              // 1. Add Rejected label
+              addLabel('Rejected');
+
+              // 2. Draft comment tagging you and explaining the closure
+              const message = `🛑 **Domain Ownership Verification Failed**\n\n` +
+                              `Hi @${prAuthor}, you are trying to alter or delete \`${violatedFile}\`, which belongs to @${trueOwner}.\n\n` +
+                              `CC: @${maintainer} — unauthorized modification attempt caught. Closing this Pull Request automatically.`;
+              addComment(message);
+
+              // 3. Auto-close the PR
+              closePR();
+              
+              // Fail the workflow run to halt any subsequent automation jobs
+              process.exit(1);
+            }
+
+            console.log('✅ Ownership verification passed or no modifications to existing domains found.');
+
           } catch (error) {
-            console.error('Labeling failed:', error.message);
+            console.error('Labeling/Verification system error:', error.message);
+            process.exit(1);
           }
-          "
+          EOF
+
+          # Run the generated validation script
+          node verify-ownership.js
