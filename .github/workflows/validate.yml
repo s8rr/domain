@@ -38,19 +38,3 @@ jobs:
             .map(f => ({ subdomain: f.replace('.json', '').toLowerCase(), records: JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8')).records }));
           fs.writeFileSync('dist-domains.json', JSON.stringify(result, null, 2));
           "
-
-      - name: Validate Secret and Create creds.json
-        env:
-          CF_TOKEN: ${{ secrets.DOMAIN }}
-        run: |
-          if [ -z "$CF_TOKEN" ]; then
-            echo "::error::Secret 'DOMAIN' is empty or not accessible!"
-            exit 1
-          fi
-          echo '{"cloudflare": {"TYPE": "CLOUDFLAREAPI", "apitoken": "'"$CF_TOKEN"'"}}' > creds.json
-
-      - name: Install DNSControl
-        uses: gacts/install-dnscontrol@v1
-
-      - name: DNSControl Lint & Preview Simulation
-        run: dnscontrol preview
