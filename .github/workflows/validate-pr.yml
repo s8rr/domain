@@ -18,97 +18,109 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
-          fetch-depth: 2 
+          fetch-depth: 0 
 
-      - name: Setup Node.js
+      - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - name: Install Dependencies
-        run: npm install 
-
-      - name: Process, Validate, and Label Pull Request
+      - name: Process, Verify Ownership, and Label
         env:
-          PR_ACTOR: ${{ github.event.pull_request.user.login }}
-          ADMIN_USER: "s8rr"
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          node -e "
+          cat << 'EOF' > verify-ownership.js
           const { execSync } = require('child_process');
-          const path = require('path');
-          
-          const actor = process.env.PR_ACTOR;
-          const admin = process.env.ADMIN_USER;
+          const fs = require('fs');
+
           const prNum = process.env.PR_NUMBER;
-          
-          const addLabel = (label) => {
-            try { execSync('gh pr edit ' + prNum + ' --add-label \"' + label + '\"'); } catch(e) {}
-          };
-          const removeLabel = (label) => {
-            try { execSync('gh pr edit ' + prNum + ' --remove-label \"' + label + '\"'); } catch(e) {}
-          };
+          const prAuthor = process.env.PR_AUTHOR;
+          const maintainer = 's8rr';
+
+          const addLabel = (label) => { try { execSync(`gh pr edit ${prNum} --add-label "${label}"`); } catch(e) {} };
+          const closePR = () => { try { execSync(`gh pr close ${prNum}`); } catch(e) {} };
+          const addComment = (message) => { try { execSync(`gh pr comment ${prNum} --body "${message}"`); } catch(e) {} };
 
           try {
-            // Helper to get files by Git diff filter and remove empty lines
+            const labels = execSync(`gh pr view ${prNum} --json labels --jq '.labels[].name'`).toString().split('\n');
+
+            if (labels.includes('bypass')) {
+                console.log('✅ Bypass detected.');
+                process.exit(0);
+            }
+
+            if (labels.includes('draft')) {
+                console.log('⚠️ Draft detected. Closing.');
+                addComment(`🚧 **Status: Draft**\n\nThis PR is marked as a draft. Closing until ready.`);
+                closePR();
+                process.exit(0);
+            }
+
+            execSync('git fetch origin main');
             const getFiles = (filter) => {
               try {
-                return execSync('git diff --name-only --diff-filter=' + filter + ' HEAD^1 HEAD')
+                return execSync(`git diff --name-only --diff-filter=${filter} origin/main HEAD`)
                   .toString().trim().split('\n').filter(Boolean);
               } catch(e) { return []; }
             };
 
-            const addedFiles = getFiles('A');
-            const modifiedFiles = getFiles('M');
-            const deletedFiles = getFiles('D');
-            
             const isDomainFile = f => f.includes('domains/') && f.endsWith('.json') && !f.endsWith('example.json');
-            
-            const newDomains = addedFiles.filter(isDomainFile);
-            const existingDomainsChanged = [...modifiedFiles, ...deletedFiles].filter(isDomainFile);
-            
-            if (newDomains.length > 0) addLabel('type: new-domain');
+            const existingDomainsChanged = [...getFiles('M'), ...getFiles('D')].filter(isDomainFile);
+
+            let ownershipViolation = false;
+            let violatedFile = '';
+            let trueOwner = '';
+            let errorType = '';
+
+            for (const file of existingDomainsChanged) {
+              try {
+                const originalContent = execSync(`git show origin/main:${file}`).toString();
+                const originalJson = JSON.parse(originalContent);
+                
+                if (originalJson.owner && originalJson.owner.toLowerCase() !== prAuthor.toLowerCase()) {
+                  ownershipViolation = true;
+                  violatedFile = file;
+                  trueOwner = originalJson.owner;
+                  errorType = 'unauthorized';
+                  break; 
+                }
+              } catch (err) {
+                ownershipViolation = true;
+                violatedFile = file;
+                trueOwner = "Unknown";
+                errorType = 'malformed';
+                break;
+              }
+            }
+
+            if (ownershipViolation) {
+              console.log(`❌ Invalid Record Detected: ${violatedFile}`);
+              addLabel('Rejected');
+              addLabel('Invalid Record');
+
+              const reason = errorType === 'malformed' 
+                ? "The JSON structure is malformed or invalid." 
+                : `You are attempting to modify a record that belongs to @${trueOwner}.`;
+
+              const message = `🛑 **Domain Record Invalid**\n\n` +
+                              `The file \`${violatedFile}\` failed validation checks.\n\n` +
+                              `**Reason:** ${reason}\n\n` +
+                              `CC: @${maintainer} — Closing this PR. Please ensure you are only modifying your own records and using valid JSON syntax.`;
+              
+              addComment(message);
+              closePR();
+              process.exit(1);
+            }
+
+            if (getFiles('A').filter(isDomainFile).length > 0) addLabel('type: new-domain');
             if (existingDomainsChanged.length > 0) addLabel('type: domain-update');
 
-            if (actor === admin) {
-              console.log('👑 Admin bypass verified.');
-              addLabel('status: valid');
-              addLabel('ownership: verified');
-              process.exit(0);
-            }
-
-            if (newDomains.length === 0 && existingDomainsChanged.length === 0) {
-              console.log('No domain files modified.');
-              process.exit(0);
-            }
-
-            // 🛡️ OWNERSHIP CHECK: ONLY applies to files that are being edited or deleted
-            existingDomainsChanged.forEach(filePath => {
-              const fileName = path.basename(filePath);
-              const cleanName = fileName.replace('.json', '');
-              const parts = cleanName.split('.');
-              const fileOwner = parts[parts.length - 1].toLowerCase().trim();
-
-              if (fileOwner !== actor.toLowerCase()) {
-                throw new Error('User ' + actor + ' is unauthorized to edit or delete records belonging to ' + fileOwner);
-              }
-            });
-
-            console.log('✅ Validation successful.');
-            removeLabel('status: invalid');
-            removeLabel('ownership: unauthorized');
-            
-            addLabel('status: valid');
-            addLabel('ownership: verified');
-            
+            console.log('✅ Verification passed.');
           } catch (error) {
-            console.error('❌ VALIDATION FAILURE:', error.message);
-            removeLabel('status: valid');
-            removeLabel('ownership: verified');
-            
-            addLabel('status: invalid');
-            addLabel('ownership: unauthorized');
+            console.error('System error:', error.message);
             process.exit(1);
           }
-          "
+          EOF
+          node verify-ownership.js

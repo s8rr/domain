@@ -1,31 +1,45 @@
 name: Validate Domain Registry
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write # Required to add/remove labels
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Head Code
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+          cache: 'npm'
 
-      - name: Install Linting Packages
-        run: npm install
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Fetch Target Branch for Diffing
+        run: git fetch origin main:origin/main
+
+      - name: Extract PR File Diffs
+        run: node util/get-pr-files.js
 
       - name: Run Core Code Validator
         run: npm run validate
         env:
-          GITHUB_ACTOR: ${{ github.actor }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_ID: ${{ github.event.pull_request.user.id }}
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
 
-      - name: Compile JSON Registry Index
+      - name: Compile JSON Registry Index (Dry-Run Test)
         run: |
           node -e "
           const fs = require('fs');
@@ -38,3 +52,39 @@ jobs:
             .map(f => ({ subdomain: f.replace('.json', '').toLowerCase(), records: JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8')).records }));
           fs.writeFileSync('dist-domains.json', JSON.stringify(result, null, 2));
           "
+
+      - name: Label as Valid
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Record Invalid'
+            }).catch(() => {});
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Record Valid']
+            });
+
+      - name: Label as Invalid
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Record Valid'
+            }).catch(() => {});
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Record Invalid']
+            });
