@@ -1,12 +1,11 @@
 name: Validate Pull Request Domain Ownership
 
 on:
-  pull_request_target: # 👈 Auto-runs when PRs open, even from forks, with secure permissions
+  pull_request_target:
     types: [opened, synchronize, reopened]
     paths:
       - 'domains/**'
 
-# 🔐 Grants the script authority to assign labels to your PR dashboard list
 permissions:
   pull-requests: write
   contents: read
@@ -19,16 +18,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
-          fetch-depth: 2 # Fetches current commit and parent for an accurate git diff
+          fetch-depth: 2 
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # 💡 Removed 'node-cache: npm' because it causes warnings and requires a lockfile
 
       - name: Install Dependencies
-        run: npm install # 👈 Changed from 'npm ci' so your workflow never crashes without a lockfile!
+        run: npm install 
 
       - name: Process, Validate, and Label Pull Request
         env:
@@ -53,49 +51,64 @@ jobs:
           };
 
           try {
-            // Evaluates changes between the PR commit and its target branch parent commit
-            const addedFiles = execSync('git diff --name-only --diff-filter=A HEAD^1 HEAD').toString().trim();
-            const modifiedFiles = execSync('git diff --name-only --diff-filter=M HEAD^1 HEAD').toString().trim();
+            // Helper to get files by Git diff filter and remove empty lines
+            const getFiles = (filter) => {
+              try {
+                return execSync('git diff --name-only --diff-filter=' + filter + ' HEAD^1 HEAD')
+                  .toString().trim().split('\n').filter(Boolean);
+              } catch(e) { return []; }
+            };
+
+            const addedFiles = getFiles('A');
+            const modifiedFiles = getFiles('M');
+            const deletedFiles = getFiles('D');
             
-            if (addedFiles.includes('domains/')) addLabel('type: new-domain');
-            if (modifiedFiles.includes('domains/')) addLabel('type: domain-update');
+            const isDomainFile = f => f.includes('domains/') && f.endsWith('.json') && !f.endsWith('example.json');
+            
+            const newDomains = addedFiles.filter(isDomainFile);
+            const existingDomainsChanged = [...modifiedFiles, ...deletedFiles].filter(isDomainFile);
+            
+            if (newDomains.length > 0) addLabel('type: new-domain');
+            if (existingDomainsChanged.length > 0) addLabel('type: domain-update');
 
             if (actor === admin) {
               console.log('👑 Admin bypass verified.');
               addLabel('status: valid');
+              addLabel('ownership: verified');
               process.exit(0);
             }
 
-            const changedFiles = execSync('git diff --name-only HEAD^1 HEAD')
-              .toString()
-              .trim()
-              .split('\n')
-              .filter(f => f.includes('domains/') && f.endsWith('.json') && !f.endsWith('example.json'));
-
-            if (changedFiles.length === 0) {
+            if (newDomains.length === 0 && existingDomainsChanged.length === 0) {
               console.log('No domain files modified.');
               process.exit(0);
             }
 
-            changedFiles.forEach(filePath => {
+            // 🛡️ OWNERSHIP CHECK: ONLY applies to files that are being edited or deleted
+            existingDomainsChanged.forEach(filePath => {
               const fileName = path.basename(filePath);
               const cleanName = fileName.replace('.json', '');
               const parts = cleanName.split('.');
               const fileOwner = parts[parts.length - 1].toLowerCase().trim();
 
               if (fileOwner !== actor.toLowerCase()) {
-                throw new Error('User ' + actor + ' is unauthorized to edit records belonging to ' + fileOwner);
+                throw new Error('User ' + actor + ' is unauthorized to edit or delete records belonging to ' + fileOwner);
               }
             });
 
             console.log('✅ Validation successful.');
             removeLabel('status: invalid');
+            removeLabel('ownership: unauthorized');
+            
             addLabel('status: valid');
+            addLabel('ownership: verified');
             
           } catch (error) {
             console.error('❌ VALIDATION FAILURE:', error.message);
             removeLabel('status: valid');
+            removeLabel('ownership: verified');
+            
             addLabel('status: invalid');
+            addLabel('ownership: unauthorized');
             process.exit(1);
           }
           "
