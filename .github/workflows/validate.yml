@@ -39,14 +39,19 @@ jobs:
           fs.writeFileSync('dist-domains.json', JSON.stringify(result, null, 2));
           "
 
-      - name: Validate Secret and Create creds.json
+      - name: Load API Token and Create creds.json
         env:
-          CF_TOKEN: ${{ secrets.DOMAIN }}
+          CF_SECRET: ${{ secrets.DOMAIN }}
+          CF_VAR: ${{ vars.DOMAIN }}
         run: |
+          # Use the secret if available; otherwise, fall back to the variable
+          CF_TOKEN="${CF_SECRET:-$CF_VAR}"
+          
           if [ -z "$CF_TOKEN" ]; then
-            echo "::error::Secret 'DOMAIN' is empty or not accessible!"
+            echo "::error::Could not find your API key! Ensure 'DOMAIN' is set under either Actions Secrets or Actions Variables."
             exit 1
           fi
+          
           echo '{"cloudflare": {"TYPE": "CLOUDFLAREAPI", "apitoken": "'"$CF_TOKEN"'"}}' > creds.json
 
       - name: Install DNSControl
