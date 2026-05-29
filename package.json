@@ -1,5 +1,5 @@
 {
-  "name": "my-dns-registry",
+  "name": "free-subdomain",
   "version": "1.0.0",
   "description": "Open Source Subdomain Registry",
   "main": "scripts/validator.js",
