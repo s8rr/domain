@@ -17,18 +17,27 @@ jobs:
           const path = require('path');
           const domainsDir = path.join(process.cwd(), 'domains');
           
+          console.log('🔍 Checking path location:', domainsDir);
+          
           if (!fs.existsSync(domainsDir)) {
-            console.error('❌ Error: domains folder missing!');
+            console.error('❌ Error: domains folder does not exist at path root location.');
             process.exit(1);
           }
           
           const files = fs.readdirSync(domainsDir);
+          console.log('📂 Files found in directory:', files);
+          
           const result = [];
           
           files.forEach(f => {
             if(f.endsWith('.json') && f !== 'example.json') {
               try {
-                const data = JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8'));
+                const fullPath = path.join(domainsDir, f);
+                const rawData = fs.readFileSync(fullPath, 'utf8');
+                const data = JSON.parse(rawData);
+                
+                console.log('📄 Processing file: ' + f + ' | Records found: ' + (data.records ? 'YES' : 'NO'));
+                
                 if (data.records) {
                   result.push({ 
                     subdomain: f.replace('.json', '').toLowerCase().trim(), 
@@ -36,14 +45,13 @@ jobs:
                   });
                 }
               } catch(err) {
-                console.error('Malformed file skipped: ' + f);
+                console.error('❌ Malformed JSON syntax error in file: ' + f, err);
               }
             }
           });
           
-          // Save directly to workspace root next to dnsconfig.js
           fs.writeFileSync('./dist-domains.json', JSON.stringify(result, null, 2));
-          console.log('✅ Found and compiled ' + result.length + ' active subdomains.');
+          console.log('🎉 Successfully saved dist-domains.json with ' + result.length + ' user entries.');
           "
 
       - name: Create Production Credentials
