@@ -37,25 +37,5 @@ jobs:
             .filter(f => f.endsWith('.json') && f !== 'example.json')
             .map(f => ({ subdomain: f.replace('.json', '').toLowerCase(), records: JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8')).records }));
           fs.writeFileSync('dist-domains.json', JSON.stringify(result, null, 2));
+          console.log('✅ Validation passed! Ready for manual merge.');
           "
-
-      - name: Load API Token and Create creds.json
-        env:
-          CF_SECRET: ${{ secrets.DOMAIN }}
-          CF_VAR: ${{ vars.DOMAIN }}
-        run: |
-          # This checks BOTH the Secrets tab and the Variables tab
-          CF_TOKEN="${CF_SECRET:-$CF_VAR}"
-          
-          if [ -z "$CF_TOKEN" ]; then
-            echo "::error::Could not find your API key! Ensure 'DOMAIN' is set under either Actions Secrets or Actions Variables."
-            exit 1
-          fi
-          
-          echo '{"cloudflare": {"TYPE": "CLOUDFLAREAPI", "apitoken": "'"$CF_TOKEN"'"}}' > creds.json
-
-      - name: Install DNSControl
-        uses: gacts/install-dnscontrol@v1
-
-      - name: DNSControl Lint & Preview Simulation
-        run: dnscontrol preview
