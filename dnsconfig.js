@@ -31,7 +31,7 @@ for (var i = 0; i < domainFiles.length; i++) {
 }
 
 // Configuration for your Master Apex Domain
-D('yourdomain.me', REG_NONE, DnsProvider(DSP_CLOUDFLARE),
+D('code-space.me', REG_NONE, DnsProvider(DSP_CLOUDFLARE),
     A('@', '192.0.2.1'),     // Your personal landing page IP
     CNAME('www', '@'),       // Point www to apex
 
