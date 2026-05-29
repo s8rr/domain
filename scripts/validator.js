@@ -4,13 +4,13 @@ const { execSync } = require('child_process');
 
 const BANNED_WORDS = ['admin', 'api', 'root', 'support', 'government', 'govt', 'bkash', 'nagad', 'bank', 'www', 'mail', 'dns'];
 
-// Helper to write error to a file for GitHub Actions to read before exiting
+// Gracefully logs errors and writes a summary file for PR comments
 function showErrorAndExit(message) {
     console.error(message);
     try {
         fs.writeFileSync('validation_error.txt', message);
     } catch (e) {
-        // Fallback if writing fails locally
+        // Fallback for local testing
     }
     process.exit(1);
 }
