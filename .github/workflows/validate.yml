@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24' # 🚀 Upgraded to Node 24 to resolve the GitHub deprecation notice
 
       - name: Fetch Remote Base Branch
         run: git fetch origin main
@@ -92,20 +92,17 @@ jobs:
               const commentHeader = `### ⚠️ Domain Registry Validation Failed`;
               const commentBody = `${commentHeader}\n\nHi @${context.actor}, your pull request contains validation errors:\n\n> ${errorBody}\n\nPlease fix this error and push the update to your branch to re-trigger checks.`;
               
-              // Get all comments on the PR
               const comments = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
               });
               
-              // Look for a comment previously made by this bot
               const existingComment = comments.data.find(c => 
                 c.user.login === 'github-actions[bot]' && c.body.includes(commentHeader)
               );
               
               if (existingComment) {
-                // Update the old error comment with the new information
                 await github.rest.issues.updateComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -113,7 +110,6 @@ jobs:
                   body: commentBody
                 });
               } else {
-                // Post a brand new comment if none exists yet
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
