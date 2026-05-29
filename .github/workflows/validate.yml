@@ -28,15 +28,26 @@ jobs:
           node -e "
           const fs = require('fs');
           const path = require('path');
-          const files = fs.readdirSync('domains');
+          const domainsDir = path.join(process.cwd(), 'domains');
+          
+          if (!fs.existsSync(domainsDir)) {
+            console.error('❌ Error: domains folder not found in current workspace root.');
+            process.exit(1);
+          }
+          
+          const files = fs.readdirSync(domainsDir);
           const result = [];
+          
           files.forEach(f => {
             if(f.endsWith('.json') && f !== 'example.json') {
-              const data = JSON.parse(fs.readFileSync('domains/' + f, 'utf8'));
+              const data = JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8'));
               result.push({ subdomain: f.replace('.json', '').toLowerCase(), records: data.records });
             }
           });
-          fs.writeFileSync('dist-domains.json', JSON.stringify(result));
+          
+          const outputPath = path.join(process.cwd(), 'dist-domains.json');
+          fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
+          console.log('✅ Compiled ' + result.length + ' domains into ' + outputPath);
           "
 
       - name: Create creds.json for DNSControl Preview
