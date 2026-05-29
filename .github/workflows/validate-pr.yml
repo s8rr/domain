@@ -1,0 +1,65 @@
+name: Validate Pull Request Domain Ownership
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'domains/**'
+
+jobs:
+  validate-ownership:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches history so git diff works perfectly
+
+      - name: Verify PR Author Matches File Owner
+        env:
+          PR_ACTOR: ${{ github.actor }}
+          ADMIN_USER: "s8rr" # 👈 Your GitHub username (allowed to edit anything)
+        run: |
+          node -e "
+          const { execSync } = require('child_process');
+          const path = require('path');
+          
+          const actor = process.env.PR_ACTOR;
+          const admin = process.env.ADMIN_USER;
+          
+          if (actor === admin) {
+            console.log('👑 Admin action detected. Skipping ownership verification.');
+            process.exit(0);
+          }
+          
+          // Identify all files added or modified in this specific pull request
+          const changedFiles = execSync('git diff --name-only origin/main...HEAD')
+            .toString()
+            .trim()
+            .split('\n')
+            .filter(f => f.startsWith('domains/') && f.endsWith('.json') && !f.endsWith('example.json'));
+            
+          if (changedFiles.length === 0) {
+            console.log('✅ No user domain files modified.');
+            process.exit(0);
+          }
+          
+          changedFiles.forEach(filePath => {
+            const fileName = path.basename(filePath); // e.g., '_vercel.karim.json' or 'karim.json'
+            
+            // Clean out the extension and isolate the target username group
+            const cleanName = fileName.replace('.json', '');
+            const parts = cleanName.split('.');
+            const fileOwner = parts[parts.length - 1].toLowerCase().trim();
+            
+            console.log('🔍 Inspecting: ' + filePath + ' | File Owner Target: ' + fileOwner + ' | PR Submitter: ' + actor);
+            
+            if (fileOwner !== actor.toLowerCase()) {
+              console.error('❌ SECURITY ERROR: You (' + actor + ') are not authorized to create or modify records belonging to \"' + fileOwner + '\"!');
+              process.exit(1);
+            }
+          });
+          
+          console.log('🎉 Ownership verified successfully! All files match the PR author.');
+          "
