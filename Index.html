@@ -92,11 +92,15 @@
 
         <div class="search-container">
             <h3>Find Your Subdomain</h3>
-            <div class="search-box">
-                <input type="text" id="subdomain-input" placeholder="yourname">
-                <span class="domain-extension">.code-space.me</span>
-                <button onclick="checkDomain()">Check Availability</button>
-            </div>
+                <div class="search-box">
+                    <input type="text" id="subdomain-input" placeholder="yourname">
+                    <select id="domain-select" class="domain-dropdown">
+                        <option value="code-space.me">.code-space.me</option>
+                        <option value="akjon.dev">.akjon.dev</option>
+                        <option value="id-card.me">.id-card.me</option>
+                    </select>
+                    <button onclick="checkDomain()">Check Availability</button>
+                </div>
             <div id="result-message" class="result"></div>
         </div>
     </section>
@@ -112,44 +116,49 @@
     </footer>
 
     <script>
-        async function checkDomain() {
-            const input = document.getElementById('subdomain-input').value.trim().toLowerCase();
-            const resultDiv = document.getElementById('result-message');
-            
-            if (!input || !/^[a-z0-9-]+$/.test(input)) {
-                resultDiv.className = "result error";
-                resultDiv.innerHTML = "Please enter a valid alphanumeric name (lowercase, numbers, dashes only).";
-                return;
-            }
-
-            resultDiv.className = "result loading";
-            resultDiv.innerHTML = "Searching registry records...";
-
-            try {
-                const repoOwner = "s8rr"; 
-                const repoName = "domain";
-                const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/domains/${input}.json`;
-                
-                const response = await fetch(url);
-
-                if (response.status === 404) {
-                    resultDiv.className = "result success";
-                    resultDiv.innerHTML = `🎉 <strong>${input}.code-space.me</strong> is available! Submit a PR to lock it in.`;
-                } else if (response.ok) {
-                    const fileData = await response.json();
-                    const config = JSON.parse(atob(fileData.content));
-                    
-                    resultDiv.className = "result taken";
-                    resultDiv.innerHTML = `❌ <strong>${input}.code-space.me</strong> is taken.<br>
-                                           👤 Owner: <a href="https://github.com/${config.owner.username}" target="_blank" style="color:#60a5fa;">@${config.owner.username}</a>`;
-                } else {
-                    throw new Error();
-                }
-            } catch (err) {
-                resultDiv.className = "result error";
-                resultDiv.innerHTML = "Error reaching system registry. Try again later.";
-            }
+    async function checkDomain() {
+        const input = document.getElementById('subdomain-input').value.trim().toLowerCase();
+        const selectedDomain = document.getElementById('domain-select').value;
+        const resultDiv = document.getElementById('result-message');
+        
+        // Basic validation
+        if (!input || !/^[a-z0-9-]+$/.test(input)) {
+            resultDiv.className = "result error";
+            resultDiv.innerHTML = "Please enter a valid alphanumeric subdomain (lowercase, numbers, dashes only).";
+            return;
         }
-    </script>
+
+        resultDiv.className = "result loading";
+        resultDiv.innerHTML = "Searching GitHub registry records...";
+
+        try {
+            const repoOwner = "s8rr"; 
+            const repoName = "domain";
+            // Hits the sub-folder directly depending on selected dropdown choice
+            const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/domains/${selectedDomain}/${input}.json`;
+            
+            const response = await fetch(url);
+
+            if (response.status === 404) {
+                // Domain is available
+                resultDiv.className = "result success";
+                resultDiv.innerHTML = `🎉 <strong>${input}.${selectedDomain}</strong> is available! Follow the docs to claim it.`;
+            } else if (response.ok) {
+                // Domain is taken, parse the file content
+                const fileData = await response.json();
+                const config = JSON.parse(atob(fileData.content));
+                
+                resultDiv.className = "result taken";
+                resultDiv.innerHTML = `❌ <strong>${input}.${selectedDomain}</strong> is already taken.<br>
+                                       👤 <strong>Owner:</strong> <a href="https://github.com/${config.owner.username}" target="_blank" style="color: #60a5fa; text-decoration: underline;">@${config.owner.username}</a>`;
+            } else {
+                throw new Error();
+            }
+        } catch (err) {
+            resultDiv.className = "result error";
+            resultDiv.innerHTML = "Error reaching GitHub system. Please try again later.";
+        }
+    }
+</script>
 </body>
 </html>
