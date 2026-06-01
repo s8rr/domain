@@ -45,11 +45,30 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const domainsDir = path.join(process.cwd(), 'domains');
-          if (!fs.existsSync(domainsDir)) process.exit(1);
-          const files = fs.readdirSync(domainsDir);
-          const result = files
-            .filter(f => f.endsWith('.json') && f !== 'example.json')
-            .map(f => ({ subdomain: f.replace('.json', '').toLowerCase(), records: JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8')).records }));
+          const targetedDomains = ['akjon.dev', 'code-space.me', 'id-card.me'];
+          const result = {};
+
+          targetedDomains.forEach(domain => {
+            result[domain] = [];
+            const dirPath = path.join(domainsDir, domain);
+            if (fs.existsSync(dirPath)) {
+              const files = fs.readdirSync(dirPath);
+              files.forEach(f => {
+                if (f.endsWith('.json') && f !== 'example.json') {
+                  try {
+                    const content = JSON.parse(fs.readFileSync(path.join(dirPath, f), 'utf8'));
+                    result[domain].push({
+                      subdomain: f.replace('.json', '').toLowerCase(),
+                      records: content.records
+                    });
+                  } catch (e) {
+                    console.error('Failed parsing ' + f + ' under ' + domain);
+                  }
+                }
+              });
+            }
+          });
+
           fs.writeFileSync('dist-domains.json', JSON.stringify(result, null, 2));
           "
 
