@@ -4,7 +4,7 @@ A free, open-source subdomain registry for developers and students. Get your own
 
 The entire system is powered by Infrastructure-as-Code using DNSControl and synced live with Cloudflare via GitHub Actions.
 
-## Requirements
+## Requirements 
 
 - **Hosting**: Your subdomain must point to a static hosting provider (GitHub Pages, Vercel, Netlify, Cloudflare Pages, etc.).
 - **Username Matching**: The name of your JSON file must match your GitHub username exactly (e.g., if your username is `arif-dev`, your file must be `domains/akjon.dev/arif-dev.json`).
