@@ -10,7 +10,7 @@ The entire system is powered by Infrastructure-as-Code using DNSControl and sync
 - **Username Matching**: The name of your JSON file must match your GitHub username exactly (e.g., if your username is `arif-dev`, your file must be `domains/akjon.dev/arif-dev.json`).
 - **Ownership**: You must be the owner of the GitHub account matching the filename. Automated verification ensures that you can only modify your own domain records.
 
-## How to Register Your Subdomain
+## How to Register Your Subdomain             
 
 ### 1. Fork and Clone
 Fork this repository to your GitHub account, then clone it locally:
