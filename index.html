@@ -1,231 +1,275 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>code-space.me | Free Subdomains for Bangladeshi Developers</title>
-    <link rel="stylesheet" href="styles.css">
-    </head>
-<body>
+    <title>akjon.dev | Free Subdomains for Developers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1a1a1a; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #262626; 
+        }
+    </style>
+</head>
+<body class="text-[#888888] antialiased selection:bg-blue-500/30">
 
-    <header class="navbar">
-        <div class="container">
-            <div class="navbar-left">
-                <div class="logo">code-space</div>
+    <nav class="bg-[#000000] border-b border-neutral-900 sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between relative">
+            <a href="index.html" class="flex items-center gap-2 z-10 hover:opacity-80 transition-opacity">
+                <div class="w-2.5 h-2.5 rounded-full bg-white"></div>
+                <span class="text-white font-medium tracking-tight text-sm">akjon.dev</span>
+            </a>
+            
+            <div class="absolute inset-x-0 flex justify-center items-center pointer-events-none">
+                <div class="flex space-x-6 text-xs font-medium text-neutral-400 pointer-events-auto">
+                    <a href="#checker" class="hover:text-white transition-colors">Domains</a>
+                    <a href="https://github.com/s8rr/domain" target="_blank" class="hover:text-white transition-colors">Open Source</a>
+                    <a href="https://docs.akjon.dev" target="_blank" class="hover:text-white transition-colors">Documentation</a>
+                </div>
             </div>
-            <div class="navbar-center">
-                <nav class="nav-links">
-                    <a href="#checker">Search</a>
-                    <a href="#docs">Docs</a>
-                    <a href="https://github.com/s8rr/domain" target="_blank">GitRepo</a>
-                    <a href="#faq">FAQ</a>
-                </nav>
-            </div>
-            <div class="navbar-right">
-                <button class="theme-toggle" aria-label="Toggle theme">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                        <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 010 1.06l-1.591 1.591a.75.75 0 11-1.06-1.06l1.591-1.591a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM18.894 17.834a.75.75 0 01-1.06 0l-1.591-1.591a.75.75 0 111.06-1.06l1.591 1.591a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM5.106 17.834a.75.75 0 010-1.06l1.591-1.591a.75.75 0 111.06 1.06l-1.591 1.591a.75.75 0 01-1.06 0zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm2.106-5.834a.75.75 0 011.06 0l1.591 1.591a.75.75 0 11-1.06 1.06L5.106 6.166a.75.75 0 010-1.06z"></path>
-                    </svg>
-                </button>
-                <a href="#checker" class="btn-dashboard">Claim yours</a>
+
+            <div class="z-10">
+                <a href="support.html" class="text-xs font-medium text-neutral-400 hover:text-white border border-neutral-800 hover:border-neutral-700 bg-[#050505] px-3 py-1.5 rounded-md transition-all">Support</a>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="container">
+    <main class="max-w-3xl mx-auto px-6 py-20">
         
-        <section class="hero-section">
-            <div class="hero-globe">🌐</div>
-            <h1 class="hero-title">code-space.me</h1>
-            <p class="hero-subtitle">A free identity for Bangladeshi developers and students on the web. Claim your unique subdomain today.</p>
-            <div class="hero-buttons">
-                <a href="#checker" class="btn-primary">Claim a subdomain</a>
-                <a href="https://github.com/s8rr/domain" target="_blank" class="btn-secondary">Source code</a>
+        <div class="text-center space-y-6 mb-24 pt-4">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-neutral-800 bg-[#050505] text-neutral-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+            </div>
+            <h1 class="text-5xl font-bold text-white tracking-tight">akjon.dev</h1>
+            <p class="text-base text-neutral-400 max-w-xl mx-auto leading-relaxed">
+                A free identity for developers on the web. Claim <br/>
+                <code class="bg-[#111] border border-neutral-800 rounded px-1.5 py-0.5 text-xs text-white font-mono">yourname.akjon.dev</code> for your personal site or project.
+            </p>
+            <div class="flex items-center justify-center gap-3 pt-2">
+                <a href="#checker" class="bg-[#0066ff] hover:bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-md transition-colors shadow-lg shadow-blue-500/10">Claim a subdomain</a>
+                <a href="https://github.com/s8rr/domain" target="_blank" class="bg-[#111] border border-neutral-800 hover:bg-neutral-900 text-white text-xs font-medium px-4 py-2 rounded-md transition-colors">Source code</a>
+            </div>
+        </div>
+
+        <hr class="border-neutral-900 my-16">
+
+        <section class="space-y-6">
+            <h2 class="text-xl font-bold text-white tracking-tight">What is akjon.dev?</h2>
+            <div class="space-y-4 text-sm text-neutral-400 leading-relaxed">
+                <p>Are you a developer looking for an awesome name for your personal website or projects? akjon.dev gives you a free subdomain that points to your static site via a CNAME DNS record.</p>
+                <p>The entire registry lives in a public GitHub repository. You claim your subdomain by submitting a pull request. Works with GitHub Pages, Netlify, Vercel, and any other static host that supports custom domains.</p>
+                <p class="text-xs text-neutral-500 font-medium pt-2">This service includes full registration across <span class="text-neutral-300">3 distinct domain spaces</span>:</p>
+            </div>
+            <div class="flex flex-wrap gap-2.5 pt-1">
+                <span class="text-xs font-mono bg-[#111] border border-neutral-800 rounded px-2.5 py-1 text-neutral-400">yourname.akjon.dev</span>
+                <span class="text-xs font-mono bg-[#111] border border-neutral-800 rounded px-2.5 py-1 text-neutral-400">yourname.code-space.me</span>
+                <span class="text-xs font-mono bg-[#111] border border-neutral-800 rounded px-2.5 py-1 text-neutral-400">yourname.id-card.me</span>
             </div>
         </section>
 
-        <section id="checker" class="availability-section card">
-            <h2>Find Your Perfect Subdomain</h2>
-            <p class="section-desc">Search for your desired username and see instantly if it's available for your personal site or project.</p>
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="subdomain-input" placeholder="yourname">
-                    <span class="extension">.code-space.me</span>
-                    <button onclick="checkDomain()">Check Availability</button>
-                </div>
-                <div id="result-message" class="result"></div>
-            </div>
-        </section>
+        <hr class="border-neutral-900 my-16">
 
-        <section class="info-section">
-            <h2>What is code-space.me?</h2>
-            <div class="info-text">
-                <p>Are you a developer looking for an awesome name for your personal website or projects? code-space.me gives you a free <code>yourname.code-space.me</code> subdomain that points to your static site via a CNAME DNS record.</p>
-                <p>The entire registry lives in a public GitHub repository. You claim your subdomain by submitting a pull request. Works with GitHub Pages, Vercel, Netlify, and other static hosts.</p>
+        <section id="docs" class="space-y-6">
+            <div>
+                <h2 class="text-xl font-bold text-white tracking-tight">How to claim your subdomain</h2>
+                <p class="text-neutral-500 text-xs mt-1">Four steps, all done through GitHub.</p>
             </div>
-            <div class="tags-row">
-                <span class="tag">me.code-space.me</span>
-                <span class="tag">bd.code-space.me</span>
-                <span class="tag">yourname.code-space.me</span>
-            </div>
-        </section>
-
-        <section id="docs" class="how-to-section">
-            <h2>How to claim your subdomain</h2>
-            <p class="section-desc">Four steps, all done through GitHub.</p>
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">01</div>
-                    <h3>Star and fork</h3>
-                    <p>Star the repository, then fork it to your own GitHub account.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">02</div>
-                    <h3>Set up your site</h3>
-                    <p>Deploy your site to GitHub Pages, Netlify, Vercel, or any static host. Note the CNAME value (e.g. yourusername.github.io).</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">03</div>
-                    <h3>Add your subdomain</h3>
-                    <p>Create a <code>yourname.json</code> file in the <code>domains/</code> folder. Edit the JSON to include your username and target CNAME.</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">04</div>
-                    <h3>Submit a pull request</h3>
-                    <p>Open a PR against the main repo. Once merged, your subdomain will go live within minutes.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="entry-section">
-            <h2>The subdomain entry</h2>
-            <p class="section-desc">Add a JSON object like this to <code>yourname.json</code>.</p>
             
-            <div class="code-window">
-                <div class="code-header">
-                    <span class="filename">yourname.json</span>
-                    <span class="language">JSON</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-5 space-y-3">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">01</div>
+                    <h3 class="text-white text-sm font-semibold">Star and fork</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Star the repository, then fork it to your own GitHub account.</p>
                 </div>
-                <div class="code-body">
-                    <pre>
-{
-  "owner": {
-    "username": "s8rr",
-    "email": "hello@example.com"
-  },
-  "records": {
-    "CNAME": "s8rr.github.io"
-  }
-}</pre>
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-5 space-y-3">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">02</div>
+                    <h3 class="text-white text-sm font-semibold">Set up your site</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Deploy your site to GitHub Pages, Netlify, Vercel, or any static host. Get the CNAME value (e.g. yourname.github.io).</p>
+                </div>
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-5 space-y-3">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">03</div>
+                    <h3 class="text-white text-sm font-semibold">Add your subdomain file</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Create your file inside the specific target directory for the domain extension you choose inside the <code class="text-[11px] bg-[#111] px-1 rounded border border-neutral-800 text-neutral-300 font-mono">domains/</code> folder layout.</p>
+                </div>
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-5 space-y-3">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">04</div>
+                    <h3 class="text-white text-sm font-semibold">Submit a pull request</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Open a PR against the main repo. Once merged, your global custom subdomain record will instantly go live.</p>
                 </div>
             </div>
-            <p class="section-paragraph">Replace <code>yourname</code> with your desired subdomain and update the owner details. Point the CNAME value to your hosted site URL.</p>
         </section>
 
-        <section class="cta-section card">
-            <div class="cta-globe">🌐</div>
-            <h2>Ready to claim yours?</h2>
-            <p>Fork the repo, add your entry, and open a pull request. Your subdomain goes live once it's merged.</p>
-            <a href="https://github.com/s8rr/domain" target="_blank" class="btn-primary-large">Fork on GitHub →</a>
+        <hr class="border-neutral-900 my-16">
+
+        <section class="space-y-4">
+            <div>
+                <h2 class="text-xl font-bold text-white tracking-tight">Repository Layout Structure</h2>
+                <p class="text-neutral-500 text-xs mt-1">Place your configuration file directly in the directory matching your chosen domain suffix:</p>
+            </div>
+            <div class="bg-[#050505] border border-neutral-900 rounded-xl p-4 overflow-x-auto">
+                <pre class="text-xs font-mono text-neutral-400 leading-relaxed">domains/
+├── akjon.dev/
+│   └── <span class="text-blue-400">sabbir.json</span>
+├── code-space.me/
+│   └── <span class="text-blue-400">sabbir.json</span>
+└── id-card.me/
+    └── <span class="text-blue-400">joshim.json</span></pre>
+            </div>
         </section>
 
+        <section class="space-y-4 pt-4">
+            <div>
+                <h2 class="text-xl font-bold text-white tracking-tight">The Subdomain Payload Template</h2>
+                <p class="text-neutral-500 text-xs mt-1">Configure your entry exactly using this schema layout format structure:</p>
+            </div>
+
+            <div class="bg-[#050505] border border-neutral-900 rounded-xl overflow-hidden mt-2">
+                <div class="flex justify-between items-center px-4 py-2.5 border-b border-neutral-900 bg-[#0a0a0a]">
+                    <span class="text-xs font-mono text-neutral-300">example.json</span>
+                    <span class="text-[10px] font-mono text-neutral-500 tracking-wider">JSON</span>
+                </div>
+                <div class="p-4 overflow-x-auto">
+<pre class="text-xs font-mono text-neutral-300"><code>{
+  <span class="text-blue-400">"owner"</span>: {
+    <span class="text-blue-400">"username"</span>: <span class="text-green-400">"exampleuser"</span>,
+    <span class="text-blue-400">"email"</span>: <span class="text-green-400">"hello@example.com"</span>
+  },
+  <span class="text-blue-400">"records"</span>: {
+    <span class="text-blue-400">"CNAME"</span>: <span class="text-green-400">"exampleuser.github.io"</span>
+  }
+}</code></pre>
+                </div>
+            </div>
+            <p class="text-xs text-neutral-500 leading-relaxed">Replace placeholder keys with your respective active details. CNAME properties direct easily to targets matching GitHub Pages, Netlify, or Vercel endpoints.</p>
+        </section>
+
+        <section id="checker" class="mt-20">
+            <div class="bg-[#050505] border border-neutral-900 rounded-2xl p-8 sm:p-12 text-center w-full shadow-2xl">
+                <h2 class="text-2xl font-bold text-white tracking-tight mb-2">Ready to claim yours?</h2>
+                <p class="text-neutral-400 text-xs mb-8 max-w-md mx-auto">Fork the repo, add your entry inside the target directory, and open a pull request. Your subdomain goes live once it's merged.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-2.5 justify-center items-center max-w-xl mx-auto">
+                    <input type="text" id="subdomain-input" placeholder="yourname" class="w-full sm:w-auto flex-1 bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-all font-mono">
+                    
+                    <div class="relative w-full sm:w-auto">
+                        <select id="domain-select" class="w-full sm:w-auto bg-[#0a0a0a] border border-neutral-800 rounded-md pl-3 pr-8 py-2 text-sm text-white focus:outline-none focus:border-neutral-700 transition-all appearance-none cursor-pointer font-mono">
+                            <option value="akjon.dev">.akjon.dev</option>
+                            <option value="code-space.me">.code-space.me</option>
+                            <option value="id-card.me">.id-card.me</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-neutral-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    
+                    <button onclick="checkDomain()" class="w-full sm:w-auto bg-[#0066ff] hover:bg-blue-600 text-white text-xs font-medium px-4 py-2.5 rounded-md transition-colors whitespace-nowrap">
+                        Check Availability
+                    </button>
+                </div>
+                
+                <div id="result-message" class="mt-5 text-xs empty:hidden transition-all max-w-xl mx-auto"></div>
+                
+                <div class="pt-8 mt-6 border-t border-neutral-900/60">
+                    <a href="https://github.com/s8rr/domain" target="_blank" class="inline-flex items-center bg-[#0066ff] hover:bg-blue-600 text-white text-xs font-medium px-5 py-2 rounded-md transition-colors">
+                        Fork on GitHub 
+                        <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer-grid">
-            <div class="footer-col-brand">
-                <div class="logo">code-space.me</div>
-                <p>A developer platform built to simplify your identity workflow.</p>
-                <div class="footer-icons">
-                    <a href="https://x.com/your-username" target="_blank" aria-label="X (Twitter)">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    <footer class="border-t border-neutral-900 bg-[#000000] mt-24">
+        <div class="max-w-3xl mx-auto px-6 py-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                
+                <div class="space-y-1 text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start gap-2">
+                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                        <span class="text-white font-medium text-xs">akjon.dev</span>
+                    </div>
+                    <p class="text-[11px] text-neutral-600">
+                        © 2026 • Maintained by <a href="https://sabbir.cc" target="_blank" class="text-neutral-400 hover:text-white underline decoration-neutral-700 transition-colors">sabbir.cc</a>
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-4 text-xs font-medium text-neutral-500">
+                    <a href="https://github.com/s8rr/domain" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+                        GitHub
                     </a>
-                    <a href="https://github.com/s8rr/domain" target="_blank" aria-label="GitHub">
-                        <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                    <a href="https://x.com/theigl" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M13.6823 10.6218L20.2391 3H18.6854L12.9921 9.61788L8.44486 3H3.2002L10.0765 13.0074L3.2002 21H4.75404L10.7663 14.0113L15.5685 21H20.8131L13.6819 10.6218H13.6823ZM11.5541 13.0956L10.8574 12.0991L5.31391 4.16971H7.70053L12.1742 10.5689L12.8709 11.5655L18.6861 19.8835H16.2995L11.5541 13.096V13.0956Z"></path></svg>
+                        Twitter
                     </a>
                 </div>
-            </div>
-            <div class="footer-col-nav">
-                <h4>Products</h4>
-                <ul>
-                    <li><a href="https://is-a.dev" target="_blank">is-a.dev</a></li>
-                    <li><a href="https://code-space.me" target="_blank">code-space.me</a></li>
-                    <li><a href="#checker">Subdomain Registry</a></li>
-                    <li><a href="#docs">API Integration</a></li>
-                </ul>
-            </div>
-            <div class="footer-col-nav">
-                <h4>Tools</h4>
-                <ul>
-                    <li><a href="https://github.com/s8rr/domain" target="_blank">DNSControl Conf</a></li>
-                    <li><a href="#checker">Domain Lookup</a></li>
-                    <li><a href="https://github.com/gacts/install-dnscontrol" target="_blank">Install DNSControl</a></li>
-                    <li><a href="https://www.whois.com" target="_blank">WHOIS lookup</a></li>
-                </ul>
-            </div>
-            <div class="footer-col-nav">
-                <h4>Connect</h4>
-                <ul>
-                    <li><a href="https://github.com/s8rr/domain" target="_blank">GitHub</a></li>
-                    <li><a href="https://x.com/your-username" target="_blank">X (Twitter)</a></li>
-                    <li><a href="mailto:support@code-space.me">Support Email</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="container footer-bottom">
-            <p>© 2026 code-space.me. Bangladesh Developer Platform.</p>
-            <div class="footer-bottom-actions">
-                <a href="#checker">Find Yours →</a>
-                <button class="theme-toggle-darkmode" aria-label="Dark mode toggle">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 010 1.06l-1.591 1.591a.75.75 0 11-1.06-1.06l1.591-1.591a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM18.894 17.834a.75.75 0 01-1.06 0l-1.591-1.591a.75.75 0 111.06-1.06l1.591 1.591a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM5.106 17.834a.75.75 0 010-1.06l1.591-1.591a.75.75 0 111.06 1.06l-1.591 1.591a.75.75 0 01-1.06 0zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm2.106-5.834a.75.75 0 011.06 0l1.591 1.591a.75.75 0 11-1.06 1.06L5.106 6.166a.75.75 0 010-1.06z"></path></svg>
-                </button>
             </div>
         </div>
     </footer>
 
     <script>
-        async function checkDomain() {
-            const input = document.getElementById('subdomain-input').value.trim().toLowerCase();
-            const resultDiv = document.getElementById('result-message');
-            
-            // Basic validation
-            if (!input || !/^[a-z0-9-]+$/.test(input)) {
-                resultDiv.className = "result error";
-                resultDiv.innerHTML = "Please enter a valid alphanumeric subdomain (lowercase, numbers, dashes only).";
-                return;
-            }
-
-            resultDiv.className = "result loading";
-            resultDiv.innerHTML = "Searching GitHub registry records...";
-
-            try {
-                // Fetch the file directly from your GitHub repository using the public contents API
-                const repoOwner = "s8rr"; 
-                const repoName = "domain";
-                const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/domains/${input}.json`;
-                
-                const response = await fetch(url);
-
-                if (response.status === 404) {
-                    // Domain is available
-                    resultDiv.className = "result success";
-                    resultDiv.innerHTML = `🎉 <strong>${input}.code-space.me</strong> is available! Follow the docs to claim it.`;
-                } else if (response.ok) {
-                    // Domain is taken, parse the file content
-                    const fileData = await response.json();
-                    const config = JSON.parse(atob(fileData.content));
-                    
-                    resultDiv.className = "result taken";
-                    resultDiv.innerHTML = `❌ <strong>${input}.code-space.me</strong> is already taken.<br>
-                                           👤 <strong>Owner:</strong> <a href="https://github.com/${config.owner.username}" target="_blank" style="color: #60a5fa; text-decoration: underline;">@${config.owner.username}</a>`;
-                } else {
-                    throw new Error();
-                }
-            } catch (err) {
-                resultDiv.className = "result error";
-                resultDiv.innerHTML = "Error reaching GitHub system. Please try again later.";
-            }
+    async function checkDomain() {
+        const input = document.getElementById('subdomain-input').value.trim().toLowerCase();
+        const selectedDomain = document.getElementById('domain-select').value;
+        const resultDiv = document.getElementById('result-message');
+        
+        const errorClasses = "text-red-400 bg-red-400/5 border border-red-500/10 p-3 rounded-lg font-medium";
+        const loadingClasses = "text-neutral-400 bg-neutral-900/40 border border-neutral-800 p-3 rounded-lg font-medium animate-pulse";
+        const successClasses = "text-green-400 bg-green-400/5 border border-green-500/10 p-3 rounded-lg font-medium";
+        const takenClasses = "text-yellow-500 bg-yellow-500/5 border border-yellow-500/10 p-3 rounded-lg font-medium";
+        
+        if (!input || !/^[a-z0-9-]+$/.test(input)) {
+            resultDiv.className = `mt-5 text-xs transition-all ${errorClasses}`;
+            resultDiv.innerHTML = "Please enter a valid alphanumeric subdomain (lowercase, numbers, dashes only).";
+            return;
         }
+
+        resultDiv.className = `mt-5 text-xs transition-all ${loadingClasses}`;
+        resultDiv.innerHTML = "Searching GitHub registry records...";
+
+        try {
+            const repoOwner = "s8rr"; 
+            const repoName = "domain";
+            const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/domains/${selectedDomain}/${input}.json`;
+            
+            const response = await fetch(url);
+            resultDiv.classList.remove('animate-pulse');
+
+            if (response.status === 404) {
+                resultDiv.className = `mt-5 text-xs transition-all ${successClasses}`;
+                resultDiv.innerHTML = `🎉 <strong class="text-white font-mono">${input}.${selectedDomain}</strong> is available! Follow the steps above to claim it.`;
+            } else if (response.ok) {
+                const fileData = await response.json();
+                const config = JSON.parse(atob(fileData.content));
+                
+                resultDiv.className = `mt-5 text-xs transition-all ${takenClasses}`;
+                resultDiv.innerHTML = `❌ <strong class="text-white font-mono">${input}.${selectedDomain}</strong> is already taken.<br>
+                                       <span class="mt-1.5 inline-block text-neutral-400">👤 Owned by: <a href="https://github.com/${config.owner?.username || ''}" target="_blank" class="text-blue-400 hover:underline">@${config.owner?.username || 'Registry'}</a></span>`;
+            } else {
+                throw new Error();
+            }
+        } catch (err) {
+            resultDiv.classList.remove('animate-pulse');
+            resultDiv.className = `mt-5 text-xs transition-all ${errorClasses}`;
+            resultDiv.innerHTML = "Error reaching GitHub system. Please check your network or try again later.";
+        }
+    }
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"8ed10d7d7a4a4b7daf845fd55d9adb1c","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
