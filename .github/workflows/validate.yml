@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write # Required to add/remove labels
 
 jobs:
   test:
@@ -19,11 +20,11 @@ jobs:
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '24' # ⬆️ Bumped to 24 to fix the future deprecation warning
+          node-version: '24'
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci # 🧹 Swapped to npm ci for a more reliable automated build
+        run: npm ci
 
       - name: Fetch Target Branch for Diffing
         run: git fetch origin main:origin/main
@@ -32,7 +33,7 @@ jobs:
         run: node util/get-pr-files.js
 
       - name: Run Core Code Validator
-        run: npm run validate # 🛠️ Swapped npx ava for your custom validation script
+        run: npm run validate
         env:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_AUTHOR_ID: ${{ github.event.pull_request.user.id }}
@@ -44,10 +45,65 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const domainsDir = path.join(process.cwd(), 'domains');
-          if (!fs.existsSync(domainsDir)) process.exit(1);
-          const files = fs.readdirSync(domainsDir);
-          const result = files
-            .filter(f => f.endsWith('.json') && f !== 'example.json')
-            .map(f => ({ subdomain: f.replace('.json', '').toLowerCase(), records: JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8')).records }));
+          const targetedDomains = ['akjon.dev', 'code-space.me', 'id-card.me'];
+          const result = {};
+
+          targetedDomains.forEach(domain => {
+            result[domain] = [];
+            const dirPath = path.join(domainsDir, domain);
+            if (fs.existsSync(dirPath)) {
+              const files = fs.readdirSync(dirPath);
+              files.forEach(f => {
+                if (f.endsWith('.json') && f !== 'example.json') {
+                  try {
+                    const content = JSON.parse(fs.readFileSync(path.join(dirPath, f), 'utf8'));
+                    result[domain].push({
+                      subdomain: f.replace('.json', '').toLowerCase(),
+                      records: content.records
+                    });
+                  } catch (e) {
+                    console.error('Failed parsing ' + f + ' under ' + domain);
+                  }
+                }
+              });
+            }
+          });
+
           fs.writeFileSync('dist-domains.json', JSON.stringify(result, null, 2));
           "
+
+      - name: Label as Valid
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Record Invalid'
+            }).catch(() => {});
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Record Valid']
+            });
+
+      - name: Label as Invalid
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Record Valid'
+            }).catch(() => {});
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Record Invalid']
+            });

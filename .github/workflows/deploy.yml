@@ -22,30 +22,34 @@ jobs:
             process.exit(1);
           }
           
-          const files = fs.readdirSync(domainsDir);
-          const result = [];
-          
-          files.forEach(f => {
-            if(f.endsWith('.json') && f !== 'example.json') {
-              try {
-                const data = JSON.parse(fs.readFileSync(path.join(domainsDir, f), 'utf8'));
-                if (data.records) {
-                  // Extracts full nested subdomain handling dots (e.g. '_vercel.example.json' -> '_vercel.example')
-                  const calculatedSubdomain = f.substring(0, f.lastIndexOf('.json')).toLowerCase().trim();
-                  
-                  result.push({ 
-                    subdomain: calculatedSubdomain, 
-                    records: data.records 
-                  });
+          const targetedDomains = ['akjon.dev', 'code-space.me', 'id-card.me'];
+          const result = {};
+
+          targetedDomains.forEach(domain => {
+            result[domain] = [];
+            const dirPath = path.join(domainsDir, domain);
+            if (fs.existsSync(dirPath)) {
+              const files = fs.readdirSync(dirPath);
+              files.forEach(f => {
+                if (f.endsWith('.json') && f !== 'example.json') {
+                  try {
+                    const content = JSON.parse(fs.readFileSync(path.join(dirPath, f), 'utf8'));
+                    if (content.records) {
+                      result[domain].push({
+                        subdomain: f.replace('.json', '').toLowerCase().trim(),
+                        records: content.records
+                      });
+                    }
+                  } catch (e) {
+                    console.error('Malformed file skipped under ' + domain + ': ' + f);
+                  }
                 }
-              } catch(err) {
-                console.error('Malformed file skipped: ' + f);
-              }
+              });
             }
           });
-          
+
           fs.writeFileSync('./dist-domains.json', JSON.stringify(result, null, 2));
-          console.log('✅ Compiled ' + result.length + ' structural record files.');
+          console.log('✅ Successfully compiled multi-domain registry index.');
           "
 
       - name: Create Production Credentials

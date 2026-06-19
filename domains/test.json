@@ -1,9 +1,0 @@
-{
-  "owner": {
-    "username": "theiglmail-droid",
-    "email": "hello@example.com"
-  },
-  "records": {
-    "CNAME": "80c8df7104362def.vercel-dns-017.com."
-  }
-}

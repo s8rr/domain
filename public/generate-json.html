@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Generator · akjon.dev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000000; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #262626; }
+
+        .domain-btn.active  { border-color: #0066ff; color: #fff; background: rgba(0,102,255,0.08); }
+        .service-btn.active { border-color: #0066ff; background: rgba(0,102,255,0.08); }
+        .service-btn.active .svc-name { color: #fff; }
+        .service-btn.active .svc-hint { color: #60a5fa; }
+
+        input:focus { border-color: #0066ff !important; outline: none; box-shadow: 0 0 0 2px rgba(0,102,255,0.15); }
+    </style>
+</head>
+<body class="text-[#888888] antialiased selection:bg-blue-500/30">
+
+    <!-- NAV -->
+    <nav class="bg-[#000000] border-b border-neutral-900 sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between relative">
+            <a href="index.html" class="flex items-center gap-2 z-10 hover:opacity-80 transition-opacity">
+                <div class="w-2.5 h-2.5 rounded-full bg-white"></div>
+                <span class="text-white font-medium tracking-tight text-sm">akjon.dev</span>
+            </a>
+            <div class="absolute inset-x-0 flex justify-center items-center pointer-events-none">
+                <div class="flex space-x-6 text-xs font-medium text-neutral-400 pointer-events-auto">
+                    <a href="index.html#checker" class="hover:text-white transition-colors">Domains</a>
+                    <a href="https://github.com/s8rr/domain" target="_blank" class="hover:text-white transition-colors">Open Source</a>
+                    <a href="https://docs.akjon.dev" target="_blank" class="hover:text-white transition-colors">Documentation</a>
+                </div>
+            </div>
+            <div class="z-10">
+                <a href="support.html" class="text-xs font-medium text-neutral-400 hover:text-white border border-neutral-800 hover:border-neutral-700 bg-[#050505] px-3 py-1.5 rounded-md transition-all">Support</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-12">
+
+        <!-- HERO — compact -->
+        <div class="mb-10">
+            <div class="inline-flex items-center gap-1.5 text-[11px] font-mono text-neutral-500 mb-3">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#0066ff]"></div>
+                JSON Generator
+            </div>
+            <h1 class="text-3xl font-bold text-white tracking-tight mb-2">Build your subdomain record</h1>
+            <p class="text-sm text-neutral-400 leading-relaxed max-w-lg">Fill in the form — get a ready-to-commit <code class="bg-[#111] border border-neutral-800 rounded px-1.5 py-0.5 text-xs text-white font-mono">.json</code> file for the <a href="https://github.com/s8rr/domain" target="_blank" class="text-[#0066ff] hover:underline">s8rr/domain</a> registry.</p>
+        </div>
+
+        <!-- MAIN CARD -->
+        <div class="bg-[#050505] border border-neutral-900 rounded-2xl overflow-hidden">
+
+            <!-- ── FORM ── -->
+            <div class="p-6 space-y-6">
+
+                <!-- Row 1: subdomain + domain selector -->
+                <div class="space-y-2">
+                    <label class="text-xs font-medium text-neutral-400">Subdomain name <span class="text-red-500">*</span></label>
+                    <div class="flex items-center gap-0">
+                        <input id="subdomain" type="text" placeholder="yourname" autocomplete="off" spellcheck="false"
+                            class="flex-1 min-w-0 bg-[#0a0a0a] border border-neutral-800 border-r-0 rounded-l-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                        <div class="relative">
+                            <select id="domain-select"
+                                class="bg-[#111] border border-neutral-800 rounded-r-md pl-3 pr-7 py-2 text-sm text-white focus:outline-none focus:border-[#0066ff] transition-all appearance-none cursor-pointer font-mono text-xs h-[38px]">
+                                <option value="akjon.dev">.akjon.dev</option>
+                                <option value="code-space.me">.code-space.me</option>
+                                <option value="id-card.me">.id-card.me</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-neutral-500">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-neutral-600">Lowercase letters, numbers and dashes only. This is your file name — doesn't have to match your GitHub username.</p>
+                </div>
+
+                <!-- Row 2: GitHub username + Email -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-medium text-neutral-400">GitHub username <span class="text-red-500">*</span></label>
+                        <input id="username" type="text" placeholder="github-handle" autocomplete="off" spellcheck="false"
+                            class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-medium text-neutral-400">Email <span class="text-red-500">*</span></label>
+                        <input id="email" type="email" placeholder="you@example.com" autocomplete="off"
+                            class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                    </div>
+                </div>
+
+                <!-- Row 3: Service -->
+                <div class="space-y-2">
+                    <label class="text-xs font-medium text-neutral-400">Hosting service <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                        <button data-service="github-pages" onclick="selectService(this)"
+                            class="service-btn active bg-[#0a0a0a] border border-neutral-900 rounded-lg p-2.5 text-left transition-all hover:border-neutral-700">
+                            <div class="svc-name text-white text-xs font-semibold leading-tight mb-0.5">GitHub<br>Pages</div>
+                            <div class="svc-hint text-[10px] font-mono text-neutral-600">CNAME</div>
+                        </button>
+                        <button data-service="vercel" onclick="selectService(this)"
+                            class="service-btn bg-[#0a0a0a] border border-neutral-900 rounded-lg p-2.5 text-left transition-all hover:border-neutral-700">
+                            <div class="svc-name text-neutral-300 text-xs font-semibold leading-tight mb-0.5">Vercel</div>
+                            <div class="svc-hint text-[10px] font-mono text-neutral-600">A + TXT</div>
+                        </button>
+                        <button data-service="netlify" onclick="selectService(this)"
+                            class="service-btn bg-[#0a0a0a] border border-neutral-900 rounded-lg p-2.5 text-left transition-all hover:border-neutral-700">
+                            <div class="svc-name text-neutral-300 text-xs font-semibold leading-tight mb-0.5">Netlify</div>
+                            <div class="svc-hint text-[10px] font-mono text-neutral-600">A + www</div>
+                        </button>
+                        <button data-service="cloudflare-pages" onclick="selectService(this)"
+                            class="service-btn bg-[#0a0a0a] border border-neutral-900 rounded-lg p-2.5 text-left transition-all hover:border-neutral-700">
+                            <div class="svc-name text-neutral-300 text-xs font-semibold leading-tight mb-0.5">Cloudflare<br>Pages</div>
+                            <div class="svc-hint text-[10px] font-mono text-neutral-600">CNAME</div>
+                        </button>
+                        <button data-service="custom" onclick="selectService(this)"
+                            class="service-btn bg-[#0a0a0a] border border-neutral-900 rounded-lg p-2.5 text-left transition-all hover:border-neutral-700">
+                            <div class="svc-name text-neutral-300 text-xs font-semibold leading-tight mb-0.5">Other /<br>Custom</div>
+                            <div class="svc-hint text-[10px] font-mono text-neutral-600">manual</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Row 4: Service-specific DNS inputs -->
+                <div id="dns-fields" class="space-y-3">
+                    <!-- injected by JS -->
+                </div>
+
+            </div>
+
+            <!-- ── DIVIDER ── -->
+            <div class="border-t border-neutral-900"></div>
+
+            <!-- ── OUTPUT ── -->
+            <div class="p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-medium text-neutral-400">Generated output</span>
+                    <span id="file-count-badge" class="text-[10px] font-mono text-neutral-600"></span>
+                </div>
+
+                <!-- File 1 -->
+                <div class="bg-[#000] border border-neutral-900 rounded-xl overflow-hidden">
+                    <div class="flex justify-between items-center px-4 py-2 border-b border-neutral-900 bg-[#0a0a0a]">
+                        <span id="file1-name" class="text-[11px] font-mono text-neutral-400">domains/akjon.dev/yourname.json</span>
+                        <button onclick="copyFile(1)" id="copy1-btn"
+                            class="text-[10px] font-mono text-neutral-500 hover:text-white border border-neutral-800 hover:border-neutral-600 px-2 py-0.5 rounded transition-all">Copy</button>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        <pre id="output1" class="text-xs font-mono text-neutral-300 leading-relaxed whitespace-pre"><span class="text-neutral-600 italic">← fill in the fields above</span></pre>
+                    </div>
+                </div>
+
+                <!-- File 2 (vercel / netlify) -->
+                <div id="file2-wrap" class="hidden bg-[#000] border border-neutral-900 rounded-xl overflow-hidden">
+                    <div class="flex justify-between items-center px-4 py-2 border-b border-neutral-900 bg-[#0a0a0a]">
+                        <span id="file2-name" class="text-[11px] font-mono text-neutral-400"></span>
+                        <button onclick="copyFile(2)" id="copy2-btn"
+                            class="text-[10px] font-mono text-neutral-500 hover:text-white border border-neutral-800 hover:border-neutral-600 px-2 py-0.5 rounded transition-all">Copy</button>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        <pre id="output2" class="text-xs font-mono text-neutral-300 leading-relaxed whitespace-pre"></pre>
+                    </div>
+                </div>
+
+                <!-- Context note -->
+                <div id="output-note" class="hidden text-[11px] text-neutral-500 leading-relaxed bg-[#0a0a0a] border border-neutral-900 rounded-lg px-4 py-3"></div>
+            </div>
+
+        </div>
+
+        <!-- HOW TO SUBMIT — compact accordion-style -->
+        <div class="mt-8 space-y-4">
+            <h2 class="text-sm font-semibold text-white">How to submit</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-4 space-y-2">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">01</div>
+                    <h3 class="text-white text-xs font-semibold">Star and fork</h3>
+                    <p class="text-[11px] text-neutral-400 leading-relaxed">Star <a href="https://github.com/s8rr/domain" target="_blank" class="text-[#0066ff] hover:underline">s8rr/domain</a>, then fork it to your account.</p>
+                </div>
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-4 space-y-2">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">02</div>
+                    <h3 class="text-white text-xs font-semibold">Add your file(s)</h3>
+                    <p class="text-[11px] text-neutral-400 leading-relaxed">Copy the generated JSON above into the correct <code class="text-[11px] bg-[#111] px-1 rounded border border-neutral-800 text-neutral-300 font-mono">domains/</code> path in your fork.</p>
+                </div>
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-4 space-y-2">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">03</div>
+                    <h3 class="text-white text-xs font-semibold">Commit and push</h3>
+                    <div class="bg-[#000] border border-neutral-900 rounded-lg p-2.5 mt-1 overflow-x-auto">
+                        <pre id="git-snippet" class="text-[10px] font-mono text-neutral-400 leading-relaxed whitespace-pre">git add domains/akjon.dev/yourname.json
+git commit -m "feat: register yourname.akjon.dev"
+git push origin main</pre>
+                    </div>
+                </div>
+                <div class="bg-[#050505] border border-neutral-900 rounded-xl p-4 space-y-2">
+                    <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">04</div>
+                    <h3 class="text-white text-xs font-semibold">Open a pull request</h3>
+                    <p class="text-[11px] text-neutral-400 leading-relaxed">PR against the original repo. Once merged, your subdomain goes live within minutes.</p>
+                </div>
+            </div>
+
+            <!-- Rules — inline compact -->
+            <div class="bg-[#050505] border border-neutral-900 rounded-xl px-4 py-3 flex flex-wrap gap-x-4 gap-y-1">
+                <span class="text-[11px] text-neutral-500">→ lowercase, numbers, dashes only</span>
+                <span class="text-[11px] text-neutral-500">→ no <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">www</code> <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">api</code> <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">admin</code> <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">mail</code></span>
+                <span class="text-[11px] text-neutral-500">→ filename must match subdomain</span>
+                <span class="text-[11px] text-neutral-500">→ no bare IP addresses</span>
+            </div>
+
+            <!-- CTA -->
+            <div class="pt-2 text-center">
+                <a href="https://github.com/s8rr/domain" target="_blank"
+                    class="inline-flex items-center bg-[#0066ff] hover:bg-blue-600 text-white text-xs font-medium px-5 py-2 rounded-md transition-colors">
+                    Fork on GitHub
+                    <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-neutral-900 bg-[#000000] mt-16">
+        <div class="max-w-3xl mx-auto px-6 py-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="space-y-1 text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start gap-2">
+                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                        <span class="text-white font-medium text-xs">akjon.dev</span>
+                    </div>
+                    <p class="text-[11px] text-neutral-600">© 2026 • Maintained by <a href="https://sabbir.cc" target="_blank" class="text-neutral-400 hover:text-white underline decoration-neutral-700 transition-colors">sabbir.cc</a></p>
+                </div>
+                <div class="flex items-center gap-4 text-xs font-medium text-neutral-500">
+                    <a href="https://github.com/s8rr/domain" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+                        GitHub
+                    </a>
+                    <a href="https://x.com/theigl" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M13.6823 10.6218L20.2391 3H18.6854L12.9921 9.61788L8.44486 3H3.2002L10.0765 13.0074L3.2002 21H4.75404L10.7663 14.0113L15.5685 21H20.8131L13.6819 10.6218H13.6823ZM11.5541 13.0956L10.8574 12.0991L5.31391 4.16971H7.70053L12.1742 10.5689L12.8709 11.5655L18.6861 19.8835H16.2995L11.5541 13.096V13.0956Z"></path></svg>
+                        Twitter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script>
+    const services = {
+        'github-pages':     { type: 'cname', placeholder: 'yourname.github.io',   autoFn: u => u ? `${u}.github.io` : '' },
+        'cloudflare-pages': { type: 'cname', placeholder: 'yoursite.pages.dev',   autoFn: () => '' },
+        'custom':           { type: 'cname', placeholder: 'yoursite.example.com', autoFn: () => '' },
+        'vercel':           { type: 'vercel' },
+        'netlify':          { type: 'netlify' },
+    };
+
+    let currentService = 'github-pages';
+
+    // ── Service cards ──────────────────────────────────────────
+    function selectService(btn) {
+        document.querySelectorAll('.service-btn').forEach(b => {
+            b.classList.remove('active');
+            b.querySelector('.svc-name').className = 'svc-name text-neutral-300 text-xs font-semibold leading-tight mb-0.5';
+            b.querySelector('.svc-hint').className = 'svc-hint text-[10px] font-mono text-neutral-600';
+        });
+        btn.classList.add('active');
+        btn.querySelector('.svc-name').className = 'svc-name text-white text-xs font-semibold leading-tight mb-0.5';
+        currentService = btn.dataset.service;
+        renderDnsFields();
+        generate();
+    }
+
+    // ── DNS field templates ────────────────────────────────────
+    function renderDnsFields() {
+        const svc = services[currentService];
+        const container = document.getElementById('dns-fields');
+
+        if (svc.type === 'cname') {
+            const u = (document.getElementById('subdomain')?.value || '');
+            const auto = svc.autoFn(u);
+            container.innerHTML = `
+                <div class="space-y-1.5">
+                    <label class="text-xs font-medium text-neutral-400">CNAME target <span class="text-red-500">*</span></label>
+                    <input id="cname-val" type="text" autocomplete="off" spellcheck="false"
+                        placeholder="${svc.placeholder}"
+                        value="${auto}"
+                        class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                </div>`;
+            document.getElementById('cname-val').addEventListener('input', generate);
+        } else if (svc.type === 'vercel') {
+            container.innerHTML = `
+                <div class="bg-[#0a0a0a] border border-neutral-900 rounded-lg px-4 py-3 text-[11px] text-neutral-500 leading-relaxed">
+                    Vercel needs <strong class="text-neutral-300">2 files</strong>: an <span class="text-neutral-300 font-mono">A</span> record for your subdomain + a <span class="text-neutral-300 font-mono">TXT</span> verification file. Get the TXT value from Vercel dashboard → Domains → Continue manually.
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-medium text-neutral-400">A Record IP <span class="text-red-500">*</span></label>
+                        <input id="vercel-ip" type="text" value="216.198.79.1" autocomplete="off" spellcheck="false"
+                            class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                        <p class="text-[10px] text-neutral-600">Verify in your Vercel dashboard — may differ.</p>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-medium text-neutral-400">TXT verification value <span class="text-neutral-600">(optional)</span></label>
+                        <input id="vercel-txt" type="text" placeholder="vc-domain-verify=..." autocomplete="off" spellcheck="false"
+                            class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                    </div>
+                </div>`;
+            document.getElementById('vercel-ip').addEventListener('input', generate);
+            document.getElementById('vercel-txt').addEventListener('input', generate);
+        } else if (svc.type === 'netlify') {
+            container.innerHTML = `
+                <div class="bg-[#0a0a0a] border border-neutral-900 rounded-lg px-4 py-3 text-[11px] text-neutral-500 leading-relaxed">
+                    Netlify needs <strong class="text-neutral-300">2 files</strong>: an <span class="text-neutral-300 font-mono">A</span> record for your subdomain + a <span class="text-neutral-300 font-mono">CNAME</span> for <span class="text-neutral-300 font-mono">www.</span>. Both are required for Netlify to verify ownership.
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-medium text-neutral-400">Netlify site URL <span class="text-red-500">*</span></label>
+                        <input id="netlify-cname" type="text" placeholder="yoursite.netlify.app" autocomplete="off" spellcheck="false"
+                            class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-medium text-neutral-400">A Record IP <span class="text-red-500">*</span></label>
+                        <input id="netlify-ip" type="text" value="75.2.60.5" autocomplete="off" spellcheck="false"
+                            class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                        <p class="text-[10px] text-neutral-600">Netlify load balancer — check your dashboard.</p>
+                    </div>
+                </div>`;
+            document.getElementById('netlify-cname').addEventListener('input', generate);
+            document.getElementById('netlify-ip').addEventListener('input', generate);
+        }
+    }
+
+    // ── JSON render with syntax highlight ─────────────────────
+    function renderJSON(obj) {
+        return JSON.stringify(obj, null, 2)
+            .replace(/"(owner|username|email|records|CNAME|A|TXT)"/g,
+                '<span class="text-blue-400">"$1"</span>')
+            .replace(/: ("([^"]*)")/g,
+                ': <span class="text-green-400">$1</span>')
+            .replace(/: (\[)/g, ': [')
+            .replace(/"([^"]+)"(?=:)/g, m => m); // keys stay blue
+    }
+
+    // ── Main generate ──────────────────────────────────────────
+    function generate() {
+        const sub  = (document.getElementById('subdomain')?.value || '').trim() || 'yourname';
+        const user = (document.getElementById('username')?.value || '').trim() || 'your-github-username';
+        const mail = (document.getElementById('email')?.value || '').trim();
+        const d    = document.getElementById('domain-select').value;
+        const svc  = services[currentService];
+
+        // Build owner
+        const owner = { username: user };
+        if (mail) owner.email = mail;
+
+        // File 1 path
+        document.getElementById('file1-name').textContent = `domains/${d}/${sub}.json`;
+
+        // Git snippet
+        const extraAdd = currentService === 'vercel'
+            ? `\ngit add domains/${d}/_vercel.${sub}.json`
+            : currentService === 'netlify'
+                ? `\ngit add domains/${d}/www.${sub}.json`
+                : '';
+        document.getElementById('git-snippet').textContent =
+            `git add domains/${d}/${sub}.json${extraAdd}\ngit commit -m "feat: register ${sub}.${d}"\ngit push origin main`;
+
+        if (svc.type === 'cname') {
+            const cnameEl = document.getElementById('cname-val');
+            const cnameVal = cnameEl ? cnameEl.value.trim() || svc.placeholder : svc.placeholder;
+            document.getElementById('output1').innerHTML = renderJSON({ owner, records: { CNAME: cnameVal } });
+            document.getElementById('file2-wrap').classList.add('hidden');
+            document.getElementById('output-note').classList.add('hidden');
+            document.getElementById('file-count-badge').textContent = '1 file';
+
+        } else if (svc.type === 'vercel') {
+            const ip  = (document.getElementById('vercel-ip')?.value || '216.198.79.1').trim();
+            const txt = (document.getElementById('vercel-txt')?.value || '').trim();
+
+            document.getElementById('output1').innerHTML = renderJSON({ owner, records: { A: [ip] } });
+
+            document.getElementById('file2-name').textContent = `domains/${d}/_vercel.${sub}.json`;
+            document.getElementById('output2').innerHTML = renderJSON({ owner, records: { TXT: txt || 'vc-domain-verify=...' } });
+            document.getElementById('file2-wrap').classList.remove('hidden');
+
+            const note = document.getElementById('output-note');
+            note.classList.remove('hidden');
+            note.innerHTML = txt
+                ? '✅ TXT value entered — both files ready to commit.'
+                : '⚠️ TXT value is optional but recommended. Leave blank if you don\'t have it yet — you can add it later.';
+            document.getElementById('file-count-badge').textContent = '2 files required';
+
+        } else if (svc.type === 'netlify') {
+            const netlifyUrl = (document.getElementById('netlify-cname')?.value || '').trim() || 'yoursite.netlify.app';
+            const netlifyIp  = (document.getElementById('netlify-ip')?.value || '75.2.60.5').trim();
+
+            document.getElementById('output1').innerHTML = renderJSON({ owner, records: { A: [netlifyIp] } });
+
+            document.getElementById('file2-name').textContent = `domains/${d}/www.${sub}.json`;
+            document.getElementById('output2').innerHTML = renderJSON({ owner, records: { CNAME: netlifyUrl } });
+            document.getElementById('file2-wrap').classList.remove('hidden');
+
+            const note = document.getElementById('output-note');
+            note.classList.remove('hidden');
+            note.innerHTML = `Save file 2 as <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-300 font-mono text-[10px]">www.${sub}.json</code> alongside your main file.`;
+            document.getElementById('file-count-badge').textContent = '2 files required';
+        }
+    }
+
+    // ── Copy ───────────────────────────────────────────────────
+    function copyFile(n) {
+        const text = document.getElementById(`output${n}`).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById(`copy${n}-btn`);
+            btn.textContent = 'Copied!';
+            btn.classList.add('text-white');
+            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('text-white'); }, 2000);
+        });
+    }
+
+    // ── Input listeners ────────────────────────────────────────
+    document.getElementById('subdomain').addEventListener('input', e => {
+        e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+        // Re-auto-fill github pages cname if applicable
+        if (currentService === 'github-pages') {
+            const ci = document.getElementById('cname-val');
+            if (ci && (!ci.value || ci.value === ci.dataset.auto)) {
+                const u = document.getElementById('username').value.trim();
+                ci.value = u ? `${u}.github.io` : '';
+                ci.dataset.auto = ci.value;
+            }
+        }
+        generate();
+    });
+    document.getElementById('username').addEventListener('input', e => {
+        // sync github pages auto cname
+        if (currentService === 'github-pages') {
+            const ci = document.getElementById('cname-val');
+            if (ci) { ci.value = e.target.value ? `${e.target.value}.github.io` : ''; }
+        }
+        generate();
+    });
+    document.getElementById('email').addEventListener('input', generate);
+    document.getElementById('domain-select').addEventListener('change', generate);
+
+    // ── Init ───────────────────────────────────────────────────
+    renderDnsFields();
+    generate();
+</script>
+</body>
+</html>
