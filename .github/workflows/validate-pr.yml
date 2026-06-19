@@ -78,11 +78,11 @@ jobs:
               try {
                 const originalContent = execSync(`git show origin/main:${file}`).toString();
                 const originalJson = JSON.parse(originalContent);
-                
-                if (originalJson.owner && originalJson.owner.toLowerCase() !== prAuthor.toLowerCase()) {
+
+                if (originalJson.owner && originalJson.owner.username && originalJson.owner.username.toLowerCase() !== prAuthor.toLowerCase()) {
                   ownershipViolation = true;
                   violatedFile = file;
-                  trueOwner = originalJson.owner;
+                  trueOwner = originalJson.owner.username;
                   errorType = 'unauthorized';
                   break; 
                 }
