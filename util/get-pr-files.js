@@ -3,11 +3,11 @@ const fs = require('fs');
 
 try {
   // Extract files that were added or modified against main branch
-  const changed = execSync('git diff --name-only --diff-filter=AM origin/main HEAD')
+  const changed = execSync('git diff --name-only --diff-filter=AM origin/main...HEAD')
     .toString().trim().split('\n').filter(Boolean);
 
   // Extract files that were deleted against main branch
-  const deleted = execSync('git diff --name-only --diff-filter=D origin/main HEAD')
+  const deleted = execSync('git diff --name-only --diff-filter=D origin/main...HEAD')
     .toString().trim().split('\n').filter(Boolean);
 
   console.log('📊 Changed files detected:', changed);
