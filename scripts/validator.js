@@ -54,10 +54,17 @@ function validate() {
     const changedFiles = getChangedFiles();
 
     const githubActor = (process.env.PR_AUTHOR || process.env.GITHUB_ACTOR) ? (process.env.PR_AUTHOR || process.env.GITHUB_ACTOR).toLowerCase() : null;
-
+    
+    let prLabels = [];
+    try {
+        if (process.env.PR_LABELS) {
+            prLabels = JSON.parse(process.env.PR_LABELS).map(l => l.toLowerCase());
+        }
+    } catch (e) {}
+    
+    const isMaintainer = githubActor === 's8rr' || prLabels.includes('bypass');
 
     changedFiles.forEach(file => {
-
         if (!file.startsWith('domains/') || file === 'domains/example.json') return;
 
         if (!file.endsWith('.json')) {
