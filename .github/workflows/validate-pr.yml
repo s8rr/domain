@@ -61,7 +61,7 @@ jobs:
             execSync('git fetch origin main');
             const getFiles = (filter) => {
               try {
-                return execSync(`git diff --name-only --diff-filter=${filter} origin/main...HEAD`)
+                  return execSync(`git diff --name-only --diff-filter=${filter} origin/main HEAD`)
                   .toString().trim().split('\n').filter(Boolean);
               } catch(e) { return []; }
             };
