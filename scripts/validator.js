@@ -42,7 +42,6 @@ function getChangedFiles() {
         validatingAll = true;
 
         const { globSync } = require('glob');
-
         return globSync('domains/**/*.json').map(p => p.replace(/\\/g, '/'));
 
     }
