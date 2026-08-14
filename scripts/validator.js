@@ -41,7 +41,9 @@ function getChangedFiles() {
 
         validatingAll = true;
 
-        return fs.readdirSync(path.join(__dirname, '../domains')).map(f => `domains/${f}`);
+        const { globSync } = require('glob');
+
+        return globSync('domains/**/*.json').map(p => p.replace(/\\/g, '/'));
 
     }
 
@@ -52,7 +54,7 @@ function validate() {
 
     const changedFiles = getChangedFiles();
 
-    const githubActor = process.env.GITHUB_ACTOR ? process.env.GITHUB_ACTOR.toLowerCase() : null;
+    const githubActor = (process.env.PR_AUTHOR || process.env.GITHUB_ACTOR) ? (process.env.PR_AUTHOR || process.env.GITHUB_ACTOR).toLowerCase() : null;
 
 
     changedFiles.forEach(file => {
