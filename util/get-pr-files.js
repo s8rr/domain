@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 
 try {
-  // Extract files that were added or modified against main branch
+// Extract files that were added or modified against main branch
   const changed = execSync('git diff --name-only --diff-filter=AM origin/main...HEAD')
     .toString().trim().split('\n').filter(Boolean);
 
