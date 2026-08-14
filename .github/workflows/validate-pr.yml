@@ -1,68 +1,64 @@
-name: "Validate Subdomain PR"
+name: Validate Pull Request Domain Ownership
 
 on:
   pull_request_target:
-    branches:
-      - main
+    types: [opened, synchronize, reopened]
     paths:
-      - 'domains/**/*.json'
+      - 'domains/**'
+
+permissions:
+  pull-requests: write
+  contents: read
 
 jobs:
-  validate:
-    name: "Validate Subdomain Configurations"
+  validate-ownership:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout PR Code
         uses: actions/checkout@v4
         with:
-          # Required to fetch history for diffing
-          fetch-depth: 0 
-          # We use the PR merge commit so we can see what the user actually changed
           ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0 
+          allow-unsafe-pr-checkout: true
 
-      - name: Setup Node.js
+      - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - name: Install dependencies
-        run: npm install glob
-
-      - name: Pre-Validation Label & Maintainer Check
-        id: check-bypass
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNum = context.issue.number;
-            const maintainer = 's8rr';
-            const prAuthor = context.payload.pull_request.user.login;
-            const execSync = require('child_process').execSync;
-            
-            try {
-              const labels = execSync(`gh pr view ${prNum} --json labels --jq '.labels[].name'`).toString().split('\n');
-
-              if (labels.includes('bypass') || prAuthor.toLowerCase() === maintainer.toLowerCase()) {
-                  console.log('✅ Bypass/Maintainer detected. Skipping ownership checks.');
-                  process.exit(0);
-              }
-
-            } catch (e) {
-              console.log('Could not fetch labels or no bypass found, proceeding to full validation.');
-            }
+      - name: Process, Verify Ownership, and Label
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          cat << 'EOF' > verify-ownership.js
+          const { execSync } = require('child_process');
+          const fs = require('fs');
 
-      - name: Run Schema and Ownership Validator
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { execSync } = require('child_process');
-            
-            // We need to fetch main so we can compare against it to find what changed
+          const prNum = process.env.PR_NUMBER;
+          const prAuthor = process.env.PR_AUTHOR;
+          const maintainer = 's8rr';
+
+          const addLabel = (label) => { try { execSync(`gh pr edit ${prNum} --add-label "${label}"`); } catch(e) {} };
+          const closePR = () => { try { execSync(`gh pr close ${prNum}`); } catch(e) {} };
+          const addComment = (message) => { try { execSync(`gh pr comment ${prNum} --body "${message}"`); } catch(e) {} };
+
+          try {
+            const labels = execSync(`gh pr view ${prNum} --json labels --jq '.labels[].name'`).toString().split('\n');
+
+            if (labels.includes('bypass') || prAuthor.toLowerCase() === maintainer.toLowerCase()) {
+                console.log('✅ Bypass/Maintainer detected. Skipping ownership checks.');
+                process.exit(0);
+            }
+
+            if (labels.includes('draft')) {
+                console.log('⚠️ Draft detected. Closing.');
+                addComment(`🚧 **Status: Draft**\n\nThis PR is marked as a draft. Closing until ready.`);
+                closePR();
+                process.exit(0);
+            }
+
             execSync('git fetch origin main');
             const getFiles = (filter) => {
               try {
@@ -71,30 +67,61 @@ jobs:
               } catch(e) { return []; }
             };
 
-            const changedFiles = getFiles('AM'); // Added or Modified
-            const deletedFiles = getFiles('D');  // Deleted
+            const isDomainFile = f => f.includes('domains/') && f.endsWith('.json') && !f.endsWith('example.json');
+            const existingDomainsChanged = [...getFiles('M'), ...getFiles('D')].filter(isDomainFile);
 
-            if (changedFiles.length === 0 && deletedFiles.length === 0) {
-              console.log("No domains modified in this PR. Skipping.");
-              process.exit(0);
+            let ownershipViolation = false;
+            let violatedFile = '';
+            let trueOwner = '';
+            let errorType = '';
+
+            for (const file of existingDomainsChanged) {
+              try {
+                const originalContent = execSync(`git show origin/main:${file}`).toString();
+                const originalJson = JSON.parse(originalContent);
+
+                if (originalJson.owner && originalJson.owner.username && originalJson.owner.username.toLowerCase() !== prAuthor.toLowerCase()) {
+                  ownershipViolation = true;
+                  violatedFile = file;
+                  trueOwner = originalJson.owner.username;
+                  errorType = 'unauthorized';
+                  break; 
+                }
+              } catch (err) {
+                ownershipViolation = true;
+                violatedFile = file;
+                trueOwner = "Unknown";
+                errorType = 'malformed';
+                break;
+              }
             }
 
-            console.log(`Validating PR by: ${context.payload.pull_request.user.login}`);
+            if (ownershipViolation) {
+              console.log(`❌ Invalid Record Detected: ${violatedFile}`);
+              addLabel('Rejected');
+              addLabel('Invalid Record');
 
-            // We pass the labels and author as environment variables to the Node script
-            const prLabels = context.payload.pull_request.labels.map(l => l.name);
+              const reason = errorType === 'malformed' 
+                ? "The JSON structure is malformed or invalid." 
+                : `You are attempting to modify a record that belongs to @${trueOwner}.`;
 
-            try {
-                execSync('node scripts/validator.js', { 
-                  stdio: 'inherit',
-                  env: {
-                    ...process.env,
-                    PR_AUTHOR: context.payload.pull_request.user.login,
-                    PR_LABELS: JSON.stringify(prLabels)
-                  }
-                });
-                console.log("✅ Validation Passed!");
-            } catch (error) {
-                console.error("❌ Validation Failed. Please check the logs above.");
-                process.exit(1);
+              const message = `🛑 **Domain Record Invalid**\n\n` +
+                              `The file \`${violatedFile}\` failed validation checks.\n\n` +
+                              `**Reason:** ${reason}\n\n` +
+                              `CC: @${maintainer} — Closing this PR. Please ensure you are only modifying your own records and using valid JSON syntax.`;
+              
+              addComment(message);
+              closePR();
+              process.exit(1);
             }
+
+            if (getFiles('A').filter(isDomainFile).length > 0) addLabel('type: new-domain');
+            if (existingDomainsChanged.length > 0) addLabel('type: domain-update');
+
+            console.log('✅ Verification passed.');
+          } catch (error) {
+            console.error('System error:', error.message);
+            process.exit(1);
+          }
+          EOF
+          node verify-ownership.js
