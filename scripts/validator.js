@@ -1,9 +1,6 @@
 const fs = require('fs');
-
 const path = require('path');
-
 const { execSync } = require('child_process');
-
 
 const BANNED_WORDS = ['admin', 'api', 'root', 'support', 'government', 'govt', 'bkash', 'nagad', 'bank', 'www', 'mail', 'dns'];
 
@@ -12,40 +9,28 @@ const BANNED_WORDS = ['admin', 'api', 'root', 'support', 'government', 'govt', '
 // itself — the filename must always be just the plain subdomain.
 const RESERVED_PREFIXES = ['_vercel', '_acme-challenge', '_dmarc', '_domainkey', '_dkim', '_github-pages-challenge'];
 
-
 function showErrorAndExit(message) {
-
     console.error(message);
-
     process.exit(1);
-
 }
-
 
 let validatingAll = false;
 
-
 function getChangedFiles() {
-
     try {
-
         // Only look at Added, Copied, Modified, or Renamed files. We handle deletions later.
-
         const output = execSync('git diff --name-only origin/main...HEAD', { encoding: 'utf8' });
-
         return output.split('\n').map(s => s.trim()).filter(Boolean);
-
     } catch (e) {
-
         console.log("Running locally or couldn't fetch git diff. Validating all files instead.");
-
+        
         validatingAll = true;
 
         const { globSync } = require('glob');
+
         return globSync('domains/**/*.json').map(p => p.replace(/\\/g, '/'));
 
     }
-
 }
 
 
@@ -65,26 +50,22 @@ function validate() {
     const isMaintainer = githubActor === 's8rr' || prLabels.includes('bypass');
 
     changedFiles.forEach(file => {
+
         if (!file.startsWith('domains/') || file === 'domains/example.json') return;
 
+        console.log(`🔍 Validating: ${file}`);
+
         if (!file.endsWith('.json')) {
-
             showErrorAndExit(`❌ Error: Only JSON configuration files are allowed inside the domains folder. Look at: \`${file}\``);
-
         }
 
+        const filename = path.basename(file, '.json').toLowerCase();
 
-        const filename = path.parse(file).name.toLowerCase();
 
-
-        // 1. Check for alphanumeric, lowercase, dash, underscore, and dot domain limits
-
-        if (!/^[a-z0-9_.-]+$/.test(filename)) {
-
+        // 1a. Validate valid characters in filename
+        if (!/^[a-z0-9\-\_\.]+$/.test(filename)) {
             showErrorAndExit(`❌ Error: Filename \`${filename}\` must contain only lowercase letters, numbers, dashes, underscores, and dots.`);
-
         }
-
 
         // 1b. Block reserved DNS label prefixes from being used as the filename/subdomain.
         // GitHub usernames can never contain an underscore, so a filename whose first
@@ -95,136 +76,78 @@ function validate() {
         const firstLabel = filename.split('.')[0];
 
         if (RESERVED_PREFIXES.includes(firstLabel)) {
-
             const suggested = filename.split('.').slice(1).join('.') || '<your-username>';
-
             showErrorAndExit(`❌ Error: Filename \`${filename}.json\` cannot start with the reserved prefix "${firstLabel}". This prefix belongs in your TXT record's "name" field instead, e.g.:\n\n  "TXT": { "name": "${firstLabel}", "value": "..." }\n\nRename your file to \`${suggested}.json\`.`);
-
         }
-
 
         // 2. Prevent system keyword hijacking
 
         if (BANNED_WORDS.includes(filename)) {
-
             showErrorAndExit(`❌ Error: The subdomain name \`${filename}\` is reserved and cannot be registered.`);
-
         }
 
-
-        const filePath = path.join(__dirname, '../', file);
-
-        const fileExists = fs.existsSync(filePath);
-
-
-        // Fetch original file from origin/main to prevent domain hijacking
-
-        let isNewFile = false;
+        // 3. Fetch original file data (if it exists on main) to check for hijacking/stealing
 
         let oldData = null;
-
-        
+        let isNewFile = true;
 
         if (!validatingAll) {
-
             try {
-
-                // Ignore stdio errors so it doesn't clutter CI logs if the file is new
-
-                const oldContent = execSync(`git show origin/main:"${file}"`, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
-
+                // If this succeeds, the file already existed on main branch before this PR
+                const oldContent = execSync(`git show origin/main:${file}`, { encoding: 'utf8' });
                 oldData = JSON.parse(oldContent);
-
+                isNewFile = false;
             } catch (e) {
-
+                // File doesn't exist on main, so it's a brand new domain registration
                 isNewFile = true;
-
             }
-
         }
 
-
-        // Handle file deletion attempt
+        // Check if file is being deleted in this PR
+        const fileExists = fs.existsSync(file);
 
         if (!fileExists) {
-
-            if (githubActor && !validatingAll && !isNewFile && oldData && oldData.owner) {
-
+            if (githubActor && !validatingAll && !isNewFile && oldData && oldData.owner && !isMaintainer) {
                 if (oldData.owner.username.toLowerCase() !== githubActor) {
-
                     showErrorAndExit(`❌ Security Violation: You ("${githubActor}") cannot delete \`${file}\` because it is owned by "${oldData.owner.username}".`);
-
                 }
-
             }
-
             return; // File is safely deleted and validation passed, move to next file
-
         }
 
-
-        // 3. Read and parse JSON content safety validation
-
+        // Read current file content in the PR
         let data;
-
         try {
-
-            data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
+            const content = fs.readFileSync(file, 'utf8');
+            data = JSON.parse(content);
         } catch (e) {
-
             showErrorAndExit(`❌ Error: File \`${file}\` is not a valid JSON object.`);
-
         }
-
 
         // 4. Enforce structural schema verification
-
         if (!data.owner || !data.owner.username || !data.records) {
-
             showErrorAndExit(`❌ Error: \`${file}\` is missing required schema components (owner.username, records).`);
-
         }
-
 
         // 5. Strict Ownership Guardrail
-
-        if (githubActor && !validatingAll) {
-
+        if (githubActor && !validatingAll && !isMaintainer) {
             if (isNewFile) {
-
                 // NEW FILE: Ensure the person creating it matches the owner.username
-
                 if (data.owner.username.toLowerCase() !== githubActor) {
-
                     showErrorAndExit(`❌ Security Violation: You are creating a new domain, but 'owner.username' ("${data.owner.username}") does not match your GitHub username ("${githubActor}"). Did you copy the example file and forget to update it?`);
-
                 }
-
             } else {
-
                 // EXISTING FILE: Check against the ORIGINAL data from main to prevent stealing
-
                 if (oldData && oldData.owner && oldData.owner.username) {
-
                     if (oldData.owner.username.toLowerCase() !== githubActor) {
-
                         showErrorAndExit(`❌ Security Violation: You ("${githubActor}") cannot modify \`${file}\` because it is originally owned by "${oldData.owner.username}".`);
-
                     }
-
                 }
-
             }
-
         }
-
     });
 
-
-    console.log("✅ Awesome! All domain files passed structural safety checks.");
-
+    console.log('✅ Awesome! All domain files passed structural safety checks.');
 }
-
 
 validate();
