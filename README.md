@@ -38,7 +38,7 @@ Example (``domains/s8rr.json``):
 ```
 ### 3. Submit a Pull Request
 
-Commit your changes and open a Pull Request against our ``main`` branch:
+Commit your changes and open a Pull Request against our ``main`` branch: 
 
 ```bash
 git add domains/YOUR-USERNAME.json
