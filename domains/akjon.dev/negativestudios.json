@@ -4,6 +4,11 @@
     "email": "rodriguezgarciadavid6@gmail.com"
   },
   "records": {
-    "CNAME": "mrlion303.github.io"
+    "CNAME": "mrlion303.github.io",
+    "TXT": {
+      "name": "_github-pages-challenge-MrLion303.negativestudios",
+      "value": "5c012a6347a60659a5e1d73312a0c5",
+      "useFullName": true
+    }
   }
 }
