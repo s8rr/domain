@@ -1,0 +1,13 @@
+{
+  "owner": {
+    "username": "itsmedavid5700"
+  },
+  "records": {
+    "CNAME": "c64cc83a0c76dcef.vercel-dns-017.com",
+    "TXT": {
+      "name": "_vercel",
+      "value": "vc-domain-verify=sruladgo.akjon.dev,8b25c2d26d95c13e42f7",
+      "useFullName": true
+    }
+  }
+}

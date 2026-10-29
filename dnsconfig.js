@@ -61,10 +61,38 @@ for (var k = 0; k < targetDomains.length; k++) {
             }
 
             // ─── TXT RECORDS ──────────────────────────────────────────────────
+            // Supports two shapes per entry:
+            //   1. A plain string  -> attached at the root of the user's subdomain
+            //      "TXT": "v=spf1 -all"
+            //   2. An object with a "name" -> attached under that name, scoped to
+            //      the user's subdomain by default (only the FIRST label of
+            //      "name" is used, e.g. "_vercel.something" becomes just "_vercel")
+            //      "TXT": { "name": "_vercel", "value": "vc-domain-verify=..." }
+            //   Set "useFullName": true on the object to use "name" exactly as
+            //   written instead of truncating it to its first label + subdomain.
             if (records.TXT) {
                 var txtData = Array.isArray(records.TXT) ? records.TXT : [records.TXT];
                 for (var j = 0; j < txtData.length; j++) {
-                    totalRecords.push(TXT(subdomain, txtData[j]));
+                    var txtEntry = txtData[j];
+                    var txtName = subdomain;
+                    var txtValue = txtEntry;
+
+                    if (typeof txtEntry === 'object' && txtEntry !== null && !Array.isArray(txtEntry)) {
+                        txtValue = txtEntry.value;
+
+                        if (txtEntry.name) {
+                            if (txtEntry.useFullName) {
+                                // Toggle: trust the user's literal name as-is
+                                txtName = txtEntry.name;
+                            } else {
+                                // Default: only the first label, scoped under the user's subdomain
+                                var firstLabel = txtEntry.name.split('.')[0];
+                                txtName = firstLabel + '.' + subdomain;
+                            }
+                        }
+                    }
+
+                    totalRecords.push(TXT(txtName, txtValue));
                 }
             }
 

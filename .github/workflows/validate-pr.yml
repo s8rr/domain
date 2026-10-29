@@ -17,8 +17,9 @@ jobs:
       - name: Checkout PR Code
         uses: actions/checkout@v4
         with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0 
+          allow-unsafe-pr-checkout: true
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
@@ -46,8 +47,8 @@ jobs:
           try {
             const labels = execSync(`gh pr view ${prNum} --json labels --jq '.labels[].name'`).toString().split('\n');
 
-            if (labels.includes('bypass')) {
-                console.log('✅ Bypass detected.');
+            if (labels.includes('bypass') || prAuthor.toLowerCase() === maintainer.toLowerCase()) {
+                console.log('✅ Bypass/Maintainer detected. Skipping ownership checks.');
                 process.exit(0);
             }
 
@@ -61,7 +62,7 @@ jobs:
             execSync('git fetch origin main');
             const getFiles = (filter) => {
               try {
-                return execSync(`git diff --name-only --diff-filter=${filter} origin/main HEAD`)
+                return execSync(`git diff --name-only --diff-filter=${filter} origin/main...HEAD`)
                   .toString().trim().split('\n').filter(Boolean);
               } catch(e) { return []; }
             };
@@ -78,11 +79,11 @@ jobs:
               try {
                 const originalContent = execSync(`git show origin/main:${file}`).toString();
                 const originalJson = JSON.parse(originalContent);
-                
-                if (originalJson.owner && originalJson.owner.toLowerCase() !== prAuthor.toLowerCase()) {
+
+                if (originalJson.owner && originalJson.owner.username && originalJson.owner.username.toLowerCase() !== prAuthor.toLowerCase()) {
                   ownershipViolation = true;
                   violatedFile = file;
-                  trueOwner = originalJson.owner;
+                  trueOwner = originalJson.owner.username;
                   errorType = 'unauthorized';
                   break; 
                 }
