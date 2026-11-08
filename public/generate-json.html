@@ -79,7 +79,7 @@
                             </div>
                         </div>
                     </div>
-                    <p class="text-[11px] text-neutral-600">Lowercase letters, numbers and dashes only. This is your file name — doesn't have to match your GitHub username.</p>
+                    <p class="text-[11px] text-neutral-600">Lowercase letters, numbers and dashes only. Choose any available subdomain name; it does not need to match your GitHub username.</p>
                 </div>
 
                 <!-- Row 2: GitHub username + Email -->
@@ -108,7 +108,7 @@
                         <button data-service="vercel" onclick="selectService(this)"
                             class="service-btn bg-[#0a0a0a] border border-neutral-900 rounded-lg p-2.5 text-left transition-all hover:border-neutral-700">
                             <div class="svc-name text-neutral-300 text-xs font-semibold leading-tight mb-0.5">Vercel</div>
-                            <div class="svc-hint text-[10px] font-mono text-neutral-600">A + TXT</div>
+                            <div class="svc-hint text-[10px] font-mono text-neutral-600">CNAME/A + TXT</div>
                         </button>
                         <button data-service="netlify" onclick="selectService(this)"
                             class="service-btn bg-[#0a0a0a] border border-neutral-900 rounded-lg p-2.5 text-left transition-all hover:border-neutral-700">
@@ -157,7 +157,7 @@
                     </div>
                 </div>
 
-                <!-- File 2 (vercel / netlify) -->
+                <!-- File 2 (netlify) -->
                 <div id="file2-wrap" class="hidden bg-[#000] border border-neutral-900 rounded-xl overflow-hidden">
                     <div class="flex justify-between items-center px-4 py-2 border-b border-neutral-900 bg-[#0a0a0a]">
                         <span id="file2-name" class="text-[11px] font-mono text-neutral-400"></span>
@@ -210,7 +210,6 @@ git push origin main</pre>
             <div class="bg-[#050505] border border-neutral-900 rounded-xl px-4 py-3 flex flex-wrap gap-x-4 gap-y-1">
                 <span class="text-[11px] text-neutral-500">→ lowercase, numbers, dashes only</span>
                 <span class="text-[11px] text-neutral-500">→ no <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">www</code> <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">api</code> <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">admin</code> <code class="bg-[#111] px-1 rounded border border-neutral-800 text-neutral-400 font-mono text-[10px]">mail</code></span>
-                <span class="text-[11px] text-neutral-500">→ filename must match subdomain</span>
                 <span class="text-[11px] text-neutral-500">→ no bare IP addresses</span>
             </div>
 
@@ -276,6 +275,23 @@ git push origin main</pre>
         generate();
     }
 
+    // ── Vercel state (kept across re-renders) ──────────────────
+    // CNAME is the default record type.
+    const vercelState = { type: 'cname', cname: '', ip: '216.198.79.1', txt: '' };
+
+    function setVercelType(type, skipGenerate) {
+        vercelState.type = type;
+        const on  = 'border-[#0066ff] bg-[#0a0a0a] text-white';
+        const off = 'border-neutral-900 bg-[#0a0a0a] text-neutral-300 hover:border-neutral-700';
+        const c = document.getElementById('vtype-cname'), a = document.getElementById('vtype-a');
+        if (!c || !a) return;
+        c.className = 'border rounded-md px-3 py-2 text-left transition-all ' + (type === 'cname' ? on : off);
+        a.className = 'border rounded-md px-3 py-2 text-left transition-all ' + (type === 'a' ? on : off);
+        document.getElementById('vercel-cname-wrap').classList.toggle('hidden', type !== 'cname');
+        document.getElementById('vercel-a-wrap').classList.toggle('hidden', type !== 'a');
+        if (!skipGenerate) generate();
+    }
+
     // ── DNS field templates ────────────────────────────────────
     function renderDnsFields() {
         const svc = services[currentService];
@@ -295,24 +311,57 @@ git push origin main</pre>
             document.getElementById('cname-val').addEventListener('input', generate);
         } else if (svc.type === 'vercel') {
             container.innerHTML = `
-                <div class="bg-[#0a0a0a] border border-neutral-900 rounded-lg px-4 py-3 text-[11px] text-neutral-500 leading-relaxed">
-                    Vercel needs <strong class="text-neutral-300">2 files</strong>: an <span class="text-neutral-300 font-mono">A</span> record for your subdomain + a <span class="text-neutral-300 font-mono">TXT</span> verification file. Get the TXT value from Vercel dashboard → Domains → Continue manually.
+                <div class="bg-[#0a0a0a] border border-neutral-900 rounded-lg px-4 py-3 text-[11px] text-neutral-500 leading-relaxed space-y-1.5">
+                    <p>Vercel needs a <span class="text-neutral-300 font-mono">CNAME</span> (or <span class="text-neutral-300 font-mono">A</span>) record <strong class="text-neutral-300">and</strong> a <span class="text-neutral-300 font-mono">TXT</span> record, both in the <strong class="text-neutral-300">same single file</strong>.</p>
+                    <ol class="list-decimal pl-4 space-y-0.5">
+                        <li>In Vercel: project → <span class="text-neutral-300">Settings → Domains</span> → add your subdomain.</li>
+                        <li>Copy the CNAME target (or A IP) and the TXT value (starts with <span class="text-neutral-300 font-mono">vc-domain-verify=</span>).</li>
+                        <li>Paste them below, then open your PR.</li>
+                        <li>After it's merged, click <span class="text-neutral-300">Refresh</span> in Vercel.</li>
+                    </ol>
+                    <p>Do <strong class="text-neutral-300">not</strong> create a <span class="text-neutral-300 font-mono">_vercel.*.json</span> file. The TXT is published at <span class="text-neutral-300 font-mono">_vercel.&lt;domain&gt;</span> for you.</p>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-medium text-neutral-400">Record type <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" id="vtype-cname" onclick="setVercelType('cname')" class="border rounded-md px-3 py-2 text-left transition-all">
+                            <div class="text-xs font-semibold">CNAME <span class="text-[#0066ff] font-mono text-[10px]">default</span></div>
+                            <div class="text-[10px] font-mono text-neutral-500">use the target from your Vercel dashboard</div>
+                        </button>
+                        <button type="button" id="vtype-a" onclick="setVercelType('a')" class="border rounded-md px-3 py-2 text-left transition-all">
+                            <div class="text-xs font-semibold">A record</div>
+                            <div class="text-[10px] font-mono text-neutral-500">switch if you prefer an IP</div>
+                        </button>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-medium text-neutral-400">A Record IP <span class="text-red-500">*</span></label>
-                        <input id="vercel-ip" type="text" value="216.198.79.1" autocomplete="off" spellcheck="false"
-                            class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
-                        <p class="text-[10px] text-neutral-600">Verify in your Vercel dashboard — may differ.</p>
+                        <div id="vercel-cname-wrap" class="space-y-1.5">
+                            <label class="text-xs font-medium text-neutral-400">CNAME target <span class="text-red-500">*</span></label>
+                            <input id="vercel-cname" type="text" value="${vercelState.cname}" placeholder="xxxxxxxxxxxxxxxx.vercel-dns-017.com" autocomplete="off" spellcheck="false"
+                                class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                            <p class="text-[10px] text-neutral-600">Copy the target shown in Vercel → Settings → Domains.</p>
+                        </div>
+                        <div id="vercel-a-wrap" class="space-y-1.5">
+                            <label class="text-xs font-medium text-neutral-400">A Record IP <span class="text-red-500">*</span></label>
+                            <input id="vercel-ip" type="text" value="${vercelState.ip}" autocomplete="off" spellcheck="false"
+                                class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
+                            <p class="text-[10px] text-neutral-600">Check your Vercel dashboard for the current IP. Use only one of CNAME or A.</p>
+                        </div>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-medium text-neutral-400">TXT verification value <span class="text-neutral-600">(optional)</span></label>
-                        <input id="vercel-txt" type="text" placeholder="vc-domain-verify=..." autocomplete="off" spellcheck="false"
+                        <label class="text-xs font-medium text-neutral-400">TXT verification value <span class="text-red-500">*</span></label>
+                        <input id="vercel-txt" type="text" value="${vercelState.txt}" placeholder="vc-domain-verify=yourname.akjon.dev,abc123..." autocomplete="off" spellcheck="false"
                             class="w-full bg-[#0a0a0a] border border-neutral-800 rounded-md px-3 py-2 text-sm text-white placeholder-neutral-600 transition-all font-mono">
                     </div>
                 </div>`;
-            document.getElementById('vercel-ip').addEventListener('input', generate);
-            document.getElementById('vercel-txt').addEventListener('input', generate);
+            ['vercel-cname','vercel-ip','vercel-txt'].forEach(id => {
+                document.getElementById(id).addEventListener('input', e => {
+                    vercelState[id === 'vercel-cname' ? 'cname' : id === 'vercel-ip' ? 'ip' : 'txt'] = e.target.value;
+                    generate();
+                });
+            });
+            setVercelType(vercelState.type, true);
         } else if (svc.type === 'netlify') {
             container.innerHTML = `
                 <div class="bg-[#0a0a0a] border border-neutral-900 rounded-lg px-4 py-3 text-[11px] text-neutral-500 leading-relaxed">
@@ -337,14 +386,15 @@ git push origin main</pre>
     }
 
     // ── JSON render with syntax highlight ─────────────────────
+    function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
     function renderJSON(obj) {
-        return JSON.stringify(obj, null, 2)
-            .replace(/"(owner|username|email|records|CNAME|A|TXT)"/g,
+        return escapeHtml(JSON.stringify(obj, null, 2))
+            .replace(/"(owner|username|email|records|CNAME|A|TXT|name|value)"(?=:)/g,
                 '<span class="text-blue-400">"$1"</span>')
             .replace(/: ("([^"]*)")/g,
-                ': <span class="text-green-400">$1</span>')
-            .replace(/: (\[)/g, ': [')
-            .replace(/"([^"]+)"(?=:)/g, m => m); // keys stay blue
+                ': <span class="text-green-400">$1</span>');
     }
 
     // ── Main generate ──────────────────────────────────────────
@@ -363,9 +413,7 @@ git push origin main</pre>
         document.getElementById('file1-name').textContent = `domains/${d}/${sub}.json`;
 
         // Git snippet
-        const extraAdd = currentService === 'vercel'
-            ? `\ngit add domains/${d}/_vercel.${sub}.json`
-            : currentService === 'netlify'
+        const extraAdd = currentService === 'netlify'
                 ? `\ngit add domains/${d}/www.${sub}.json`
                 : '';
         document.getElementById('git-snippet').textContent =
@@ -380,21 +428,37 @@ git push origin main</pre>
             document.getElementById('file-count-badge').textContent = '1 file';
 
         } else if (svc.type === 'vercel') {
-            const ip  = (document.getElementById('vercel-ip')?.value || '216.198.79.1').trim();
-            const txt = (document.getElementById('vercel-txt')?.value || '').trim();
+            const txt = (vercelState.txt || '').trim();
+            const expectedPrefix = `vc-domain-verify=${sub}.${d},`;
+            const code = 'bg-[#111] px-1 rounded border border-neutral-800 text-neutral-300 font-mono text-[10px]';
 
-            document.getElementById('output1').innerHTML = renderJSON({ owner, records: { A: [ip] } });
-
-            document.getElementById('file2-name').textContent = `domains/${d}/_vercel.${sub}.json`;
-            document.getElementById('output2').innerHTML = renderJSON({ owner, records: { TXT: txt || 'vc-domain-verify=...' } });
-            document.getElementById('file2-wrap').classList.remove('hidden');
+            const records = {};
+            let missingTarget = false;
+            if (vercelState.type === 'cname') {
+                const target = (vercelState.cname || '').trim();
+                missingTarget = !target;
+                records.CNAME = target || 'xxxxxxxxxxxxxxxx.vercel-dns-017.com';
+            } else {
+                const ip = (vercelState.ip || '').trim();
+                missingTarget = !ip;
+                records.A = [ip || '216.198.79.1'];
+            }
+            records.TXT = { name: '_vercel', value: txt || `${expectedPrefix}xxxxxxxxxxxxxxxxxxxx` };
+            document.getElementById('output1').innerHTML = renderJSON({ owner, records });
+            document.getElementById('file2-wrap').classList.add('hidden');
 
             const note = document.getElementById('output-note');
             note.classList.remove('hidden');
-            note.innerHTML = txt
-                ? '✅ TXT value entered — both files ready to commit.'
-                : '⚠️ TXT value is optional but recommended. Leave blank if you don\'t have it yet — you can add it later.';
-            document.getElementById('file-count-badge').textContent = '2 files required';
+            if (missingTarget) {
+                note.innerHTML = `⚠️ Enter the ${vercelState.type === 'cname' ? 'CNAME target' : 'A record IP'} shown in your Vercel dashboard.`;
+            } else if (!txt) {
+                note.innerHTML = `⚠️ Paste the TXT value from Vercel (Settings → Domains). It must start with <code class="${code}">${escapeHtml(expectedPrefix)}</code>`;
+            } else if (!txt.startsWith(expectedPrefix)) {
+                note.innerHTML = `❌ This TXT value does not match <code class="${code}">${sub}.${d}</code>. It must start with <code class="${code}">${escapeHtml(expectedPrefix)}</code> or your PR will fail validation.`;
+            } else {
+                note.innerHTML = `✅ One file only. Do not create a <code class="${code}">_vercel.*.json</code> file. The TXT is published at <code class="${code}">_vercel.${d}</code> automatically. After your PR is merged, click <strong>Refresh</strong> in Vercel.`;
+            }
+            document.getElementById('file-count-badge').textContent = '1 file';
 
         } else if (svc.type === 'netlify') {
             const netlifyUrl = (document.getElementById('netlify-cname')?.value || '').trim() || 'yoursite.netlify.app';
@@ -427,15 +491,6 @@ git push origin main</pre>
     // ── Input listeners ────────────────────────────────────────
     document.getElementById('subdomain').addEventListener('input', e => {
         e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-        // Re-auto-fill github pages cname if applicable
-        if (currentService === 'github-pages') {
-            const ci = document.getElementById('cname-val');
-            if (ci && (!ci.value || ci.value === ci.dataset.auto)) {
-                const u = document.getElementById('username').value.trim();
-                ci.value = u ? `${u}.github.io` : '';
-                ci.dataset.auto = ci.value;
-            }
-        }
         generate();
     });
     document.getElementById('username').addEventListener('input', e => {

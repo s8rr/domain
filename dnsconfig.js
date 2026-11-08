@@ -70,6 +70,9 @@ for (var k = 0; k < targetDomains.length; k++) {
             //      "TXT": { "name": "_vercel", "value": "vc-domain-verify=..." }
             //   Set "useFullName": true on the object to use "name" exactly as
             //   written instead of truncating it to its first label + subdomain.
+            //   SPECIAL CASE: name "_vercel" is placed at "_vercel.<zone>" (not under the
+            //   subdomain), as Vercel requires, and only if the value starts with
+            //   "vc-domain-verify=<subdomain>.<zone>,".
             if (records.TXT) {
                 var txtData = Array.isArray(records.TXT) ? records.TXT : [records.TXT];
                 for (var j = 0; j < txtData.length; j++) {
@@ -81,7 +84,22 @@ for (var k = 0; k < targetDomains.length; k++) {
                         txtValue = txtEntry.value;
 
                         if (txtEntry.name) {
-                            if (txtEntry.useFullName) {
+                            var fullHost = subdomain + '.' + domain;
+                            var isVercelTxt = txtEntry.name.split('.')[0] === '_vercel';
+
+                            if (isVercelTxt) {
+                                // Vercel verifies subdomains via a TXT record at "_vercel.<zone>"
+                                // (NOT "_vercel.<subdomain>.<zone>"). Several users can share this
+                                // name because each value is unique per subdomain. For safety the
+                                // value MUST be scoped to the user's own hostname, so nobody can
+                                // publish a verification token for somebody else's subdomain.
+                                if (typeof txtValue === 'string' && txtValue.indexOf('vc-domain-verify=' + fullHost + ',') === 0) {
+                                    txtName = '_vercel';
+                                } else {
+                                    // Invalid Vercel token -> skip this record entirely
+                                    continue;
+                                }
+                            } else if (txtEntry.useFullName) {
                                 // Toggle: trust the user's literal name as-is
                                 txtName = txtEntry.name;
                             } else {

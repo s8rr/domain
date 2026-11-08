@@ -1,0 +1,13 @@
+{
+  "owner": {
+    "username": "walid-MCdev",
+    "email": "hi@sabbir.cc"
+  },
+  "records": {
+    "CNAME": "f1fe4895d7798b5e.vercel-dns-017.com.",
+    "TXT": {
+      "name": "_vercel",
+      "value": "vc-domain-verify=rsc.akjon.dev,ae5dd756484cc28ec179"
+    }
+  }
+}

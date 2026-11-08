@@ -87,7 +87,7 @@
             <h2 class="text-xl font-bold text-white tracking-tight">What is akjon.dev?</h2>
             <div class="space-y-4 text-sm text-neutral-400 leading-relaxed">
                 <p>Are you a developer looking for an awesome name for your personal website or projects? akjon.dev gives you a free subdomain that points to your static site via a CNAME DNS record.</p>
-                <p>The entire registry lives in a public GitHub repository. You claim your subdomain by submitting a pull request. Works with GitHub Pages, Netlify, Vercel, and any other static host that supports custom domains.</p>
+                <p>The entire registry lives in a public GitHub repository. You claim your subdomain by submitting a pull request. Works with GitHub Pages and Vercel. After your pull request is merged, add your subdomain as a custom domain in your host's dashboard (GitHub: Settings &rarr; Pages).</p>
                 <p class="text-xs text-neutral-500 font-medium pt-2">This service includes full registration across <span class="text-neutral-300">3 distinct domain spaces</span>:</p>
             </div>
             <div class="flex flex-wrap gap-2.5 pt-1">
@@ -114,7 +114,7 @@
                 <div class="bg-[#050505] border border-neutral-900 rounded-xl p-5 space-y-3">
                     <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">02</div>
                     <h3 class="text-white text-sm font-semibold">Set up your site</h3>
-                    <p class="text-xs text-neutral-400 leading-relaxed">Deploy your site to GitHub Pages, Netlify, Vercel, or any static host. Get the CNAME value (e.g. yourname.github.io).</p>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Deploy your site to GitHub Pages or Vercel. Use the generator to create your record file. After your PR is merged, add your subdomain as the custom domain on your host.</p>
                 </div>
                 <div class="bg-[#050505] border border-neutral-900 rounded-xl p-5 space-y-3">
                     <div class="text-[10px] font-mono bg-[#111] border border-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded w-fit">03</div>
@@ -170,7 +170,7 @@
 }</code></pre>
                 </div>
             </div>
-            <p class="text-xs text-neutral-500 leading-relaxed">Replace placeholder keys with your respective active details. CNAME properties direct easily to targets matching GitHub Pages, Netlify, or Vercel endpoints.</p>
+            <p class="text-xs text-neutral-500 leading-relaxed">Replace placeholder keys with your respective active details. GitHub Pages uses a CNAME to yourname.github.io; Vercel uses an A record plus a _vercel TXT token in the same file. Always add your subdomain as a custom domain on your host afterwards, or visitors will see a certificate error.</p>
         </section>
 
         <section id="checker" class="mt-20">
