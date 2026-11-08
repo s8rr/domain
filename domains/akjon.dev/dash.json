@@ -1,0 +1,12 @@
+{
+  "owner": {
+    "username": "s8rr"
+  },
+  "records": {
+    "CNAME": "e8bacb400ac2dfb6.vercel-dns-017.com.",
+    "TXT": {
+      "name": "_vercel",
+      "value": "vc-domain-verify=dash.akjon.dev,ad1b98b179e5a97da1e9"
+    }
+  }
+}
