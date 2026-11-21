@@ -1,0 +1,13 @@
+{
+  "owner": {
+    "username": "resuramor-oss",
+    "email": "resuramor@proton.me"
+  },
+  "records": {
+    "CNAME": "552c152d129d79cf.vercel-dns-017.com",
+    "TXT": {
+      "name": "_vercel",
+      "value": "vc-domain-verify=resuramor-oss.code-space.me,a14640fe3d8a2238c97c"
+    }
+  }
+}
